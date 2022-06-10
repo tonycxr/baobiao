@@ -4,37 +4,37 @@ import lombok.Data;
 
 @Data
 public class User {
-    String id;
+    private String id;
 
-    String loginid;
+    private String loginid;
 
-    String name;
+    private String name;
 
-    String password;
+    private String password;
 
-    String usercode;
+    private String usercode;
 
-    String sex;
+    private String sex;
 
-    String birthday;
+    private String birthday;
 
-    String organizationid;
+    private String organizationid;
 
-    String email;
+    private String email;
 
-    String mobile;
+    private String mobile;
 
-    String phone;
+    private String phone;
 
-    String active;
+    private String active;
 
-    String available;
+    private String available;
 
-    String  operatetype;
+    private String  operatetype;
 
-    String[] areaid;//区域ID
+    private String[] areaid;//区域ID
 
-    String[] areaname;//区域名称
+    private String[] areaname;//区域名称
 
     private String remark;//用户描述
 
@@ -42,11 +42,4 @@ public class User {
 
     private String areaId;//区域ID
 
-    public String getAreaId() {
-        return areaId;
-    }
-
-    public void setAreaId(String areaId) {
-        this.areaId = areaId;
-    }
 }

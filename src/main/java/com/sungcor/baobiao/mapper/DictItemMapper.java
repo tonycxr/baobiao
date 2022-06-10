@@ -32,19 +32,19 @@ public interface DictItemMapper {
     public void deleteDictItemById(int id);
     /**
      * 根据字典分类ID删除所属的字典项
-     * @param dictId
+     * @param id
      */
     public void deleteDictItemByDictId(int id);
 
     /**
      * 修改字典项
-     * @param dict 字典项
+     * @param dictItem 字典项
      */
     public void updateDictItem(DictItem dictItem);
 
     /**
      * 根据字典分类ID得到字典项的数量
-     * @param id 字典分类ID
+     * @param dictId 字典分类ID
      * @return  某字典分类的字典项数量
      */
     @SuppressWarnings("unchecked")

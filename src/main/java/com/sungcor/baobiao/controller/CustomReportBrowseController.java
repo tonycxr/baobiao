@@ -1,8 +1,10 @@
 package com.sungcor.baobiao.controller;
 
+import com.sungcor.baobiao.entity.UserInfoBean;
 import com.sungcor.baobiao.report.service.*;
 import com.sungcor.baobiao.report.bean.*;
 
+import com.sungcor.baobiao.utils.SessionHelper;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.HashMap;
