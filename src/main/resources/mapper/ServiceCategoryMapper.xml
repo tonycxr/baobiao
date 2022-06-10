@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.ServiceCategoryMapper">
+
+    <resultMap id="serviceCategoryBeanMap" type="com.sungcor.baobiao.entity.ServiceCategory">
+        <result property="id" column="ID" />
+        <result property="code" column="CODE" />
+        <result property="name" column="Name" />
+        <result property="sysFlag" column="sysFlag" />
+    </resultMap>
+
+    <select id="getCategoryById" parameterType="Integer"  resultMap="serviceCategoryBeanMap">
+        SELECT * FROM SF_SERVICE_CATEGORY WHERE ID = #{id}
+    </select>
+
+
+    <select id="getAll"   resultMap="serviceCategoryBeanMap">
+        SELECT * FROM SF_SERVICE_CATEGORY
+    </select>
+
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.report.mapper.ReportGroupMapper">
+    <resultMap id="reportTypeMap" type="com.sungcor.baobiao.report.bean.ReportTypeBean">
+        <result property="id" column="ID" />
+        <result property="name" column="NAME" />
+    </resultMap>
+
+    <resultMap id="reportGroupMap" type="com.sungcor.baobiao.report.bean.ReportGroupBean">
+        <result property="id" column="ID" />
+        <result property="code" column="CODE" />
+        <result property="name" column="NAME" />
+        <result property="desc" column="DESCRIPTION" />
+    </resultMap>
+
+    <select id="findReportTypeList"  resultMap="reportTypeMap">
+        SELECT ID,NAME FROM REPORT_TYPE_T
+    </select>
+
+    <select id="findReportGroupList"  resultMap="reportGroupMap">
+        SELECT *  FROM REPORT_GROUP_T
+    </select>
+
+    <select id="findReportGroupByName" parameterType="String" resultMap="reportGroupMap">
+        SELECT * FROM REPORT_GROUP_T WHERE NAME = #{name}
+    </select>
+
+    <select id="findReportGroupById" parameterType="int" resultMap="reportGroupMap">
+        SELECT * FROM REPORT_GROUP_T WHERE ID = #{id}
+    </select>
+
+    <insert id="addReportGroup" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.sungcor.baobiao.report.bean.ReportGroupBean" >
+        INSERT INTO REPORT_GROUP_T (ID,CODE,NAME,DESCRIPTION) VALUES (#{id},#{code},#{name},#{desc})
+    </insert>
+
+    <delete id="deleteReportGroupById" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_GROUP_T WHERE ID in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="updateReportGroup" parameterType="com.sungcor.baobiao.report.bean.ReportGroupBean">
+        UPDATE REPORT_GROUP_T SET DESCRIPTION = #{desc}
+        <if test="name!=null"> ,NAME = #{name}</if>
+        <if test="code!=null"> ,CODE = #{code} </if>
+        WHERE ID = #{id}
+    </update>
+
+    <select id="findModelNumByGroupId" parameterType="java.util.Arrays" resultType="map">
+        SELECT G.ID id,G.NAME name, COUNT(*) num FROM REPORT_MODEL_T M
+        LEFT JOIN REPORT_GROUP_T G ON G.ID = M.GROUP_ID
+        WHERE G.ID IN
+        <foreach collection="array" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+        GROUP BY G.ID,G.NAME
+    </select>
+</mapper>

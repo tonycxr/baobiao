@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.BusinessOptMapper">
+
+    <resultMap id="businessOptBeanMap" type="com.sungcor.baobiao.entity.BusinessOpt">
+        <result property="id" column="ID" />
+        <result property="optPersonID" column="OPT_PERSON_ID" />
+        <result property="optTime" column="OPT_TIME" />
+        <result property="optType" column="OPT_TYPE" />
+        <result property="nodeHistoryID" column="NODE_HISTORY_ID"   />
+        <result property="processInstanceID" column="PROCESS_INSTANCE_ID"   />
+        <result property="optReason" column="OPT_REASON" />
+        <result property="appendAtt" column="APPEND_ATT" />
+
+    </resultMap>
+    
+
+
+    <select id="getBusinessOptByNhAndOpType" parameterType="Map" resultMap="businessOptBeanMap">
+        SELECT *  FROM BPM_PROCESS_RUNLOG  WHERE  NODE_HISTORY_ID=#{nodeHistoryID}  AND OPT_TYPE=#{optType}
+    </select>
+
+    <select id="getBusinessOptByPID" parameterType="Integer" resultMap="businessOptBeanMap">
+        SELECT *  FROM BPM_PROCESS_RUNLOG  WHERE  PROCESS_INSTANCE_ID=#{id} ORDER BY OPT_TIME ASC
+    </select>
+
+    <select id="getBusinessOptByPIDAndNhId" parameterType="map" resultMap="businessOptBeanMap">
+        SELECT *  FROM BPM_PROCESS_RUNLOG  WHERE  PROCESS_INSTANCE_ID=#{pid} AND NODE_HISTORY_ID=#{nodeHistoryId}
+    </select>
+
+
+
+    <insert id="save" parameterType="com.sungcor.baobiao.entity.BusinessOpt" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BPM_PROCESS_RUNLOG (OPT_PERSON_ID, OPT_TIME, OPT_TYPE , NODE_HISTORY_ID , OPT_REASON , APPEND_ATT , PROCESS_INSTANCE_ID )
+        VALUES (#{optPersonID}, #{optTime}, #{optType} , #{nodeHistoryID} , #{optReason} , #{appendAtt} , #{processInstanceID} )
+    </insert>
+    
+
+    <update id="update" parameterType="com.sungcor.baobiao.entity.BusinessOpt">
+        UPDATE BPM_PROCESS_RUNLOG
+        <set>
+            <if test="optPersonID != null">OPT_PERSON_ID=#{optPersonID},</if>
+            <if test="optTime != null">OPT_TIME=#{optTime},</if>
+            <if test="optType != null">OPT_TYPE=#{optType},</if>
+            <if test="nodeHistoryID != null">NODE_HISTORY_ID=#{nodeHistoryID},</if>
+            <if test="processInstanceID != null">OPT_REASON=#{processInstanceID},</if>
+            <if test="optReason != null">APPEND_ATT=#{optReason},</if>
+            <if test="processInstanceID != null">PROCESS_INSTANCE_ID=#{processInstanceID},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+
+
+</mapper>

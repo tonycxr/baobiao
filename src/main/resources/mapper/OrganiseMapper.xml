@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.OrganiseMapper">
+
+    <resultMap id="organiseBeanMap" type="com.sungcor.baobiao.entity.Organise" >
+        <result property="id" column="ID" />
+        <result property="code" column="CODE" />
+        <result property="name" column="NAME" />
+        <result property="parentOrgID" column="PARENT_ID" />
+        <result property="governingUnitID" column="GOVERNINGUNIT_ID" />
+        <result property="description" column="DESCRIPTION" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="modifyTime" column="MODIFY_TIME" />
+        <result property="createUser" column="CREATE_USER" />
+        <result property="modifyUser" column="MODIFY_USER" />
+        <result property="sort" column="SORT" />
+        <result property="thirdorganizationId" column="3RDORGANIZATION_ID"/>
+    </resultMap>
+
+    <select id="getOrganiseListByParentID" parameterType="int" resultMap="organiseBeanMap">
+        SELECT a.*
+        FROM SYS_ORGANIZATION a
+        WHERE a.PARENT_ID = #{id} ORDER BY SORT
+    </select>
+
+    <select id="getOrganiseById" parameterType="int" resultMap="organiseBeanMap">
+        SELECT a.*
+        FROM SYS_ORGANIZATION a
+        WHERE a.ID = #{id}
+    </select>
+
+    <insert id="insertOrganise" parameterType="com.sungcor.baobiao.entity.Organise"  >
+        INSERT INTO SYS_ORGANIZATION (CODE, NAME, PARENT_ID , GOVERNINGUNIT_ID , DESCRIPTION , CREATE_USER , CREATE_TIME ,
+        MODIFY_USER , MODIFY_TIME,SORT,3RDORGANIZATION_ID )
+        VALUES (#{code}, #{name}, #{parentOrgID} , #{governingUnitID} , #{description} , #{createUser} , #{createTime} ,
+        #{modifyUser} , #{modifyTime} , #{sort},#{thirdorganizationId} )
+        <selectKey resultType="int" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <delete id="deleteOrganiseByID" parameterType="int">
+        DELETE FROM SYS_ORGANIZATION WHERE ID = #{id}
+    </delete>
+
+    <update id="updateOrganiseByID" parameterType="com.sungcor.baobiao.entity.Organise">
+        UPDATE SYS_ORGANIZATION
+        <set>
+            <if test="name != null">NAME=#{name},</if>
+            <if test="parentOrgID != null">PARENT_ID=#{parentOrgID},</if>
+            <if test="governingUnitID != null">GOVERNINGUNIT_ID=#{governingUnitID},</if>
+            <if test="description != null">DESCRIPTION=#{description},</if>
+            <if test="modifyUser != null">MODIFY_USER=#{modifyUser},</if>
+            <if test="modifyTime != null">MODIFY_TIME=#{modifyTime},</if>
+            <if test="sort != null">SORT=#{sort},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="getRelatedChildrenOrgs" resultType="hashMap">
+        SELECT a.ID, a.NAME FROM SYS_ORGANIZATION a  WHERE a.ID IN
+        <foreach item="item" index="index" collection="array"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND   EXISTS (SELECT b.ID FROM SYS_ORGANIZATION b WHERE b.PARENT_ID = a.ID)  ;
+    </select>
+
+    <select id="getRelatedUserOrgs" resultType="hashMap">
+        SELECT a.ID, a.NAME FROM SYS_ORGANIZATION a  WHERE a.ID IN
+        <foreach item="item" index="index" collection="array"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND   EXISTS (SELECT b.ID FROM SYS_USER b WHERE b.ORGANIZATION_ID = a.ID)  ;
+    </select>
+
+    <select id="getOrganiseCountByParentID" parameterType="Map" resultType="hashMap">
+        SELECT COUNT(ID) as organiseCount FROM SYS_ORGANIZATION WHERE PARENT_ID = #{parentID}
+    </select>
+
+    <select id="getChildrenOrganises" parameterType="Map" resultMap="organiseBeanMap">
+        SELECT * FROM SYS_ORGANIZATION WHERE PARENT_ID = #{parentID} ORDER BY SORT  LIMIT #{beginRow},#{pageRowCnt}
+    </select>
+
+    <select id="getMaxOrganiseSortByParentID" parameterType="Map" resultType="hashMap">
+        SELECT MAX(SORT) as organiseMaxSort FROM SYS_ORGANIZATION WHERE PARENT_ID = #{parentID}
+    </select>
+
+    <update id="updateSortBefore1" parameterType="com.sungcor.baobiao.entity.Organise">
+        UPDATE SYS_ORGANIZATION SET SORT = SORT+1  WHERE    PARENT_ID = #{parentID} AND  (SORT >=  #{targetSortID}  AND  SORT &lt;  #{sortID} )
+    </update>
+
+    <update id="updateSortBefore2" parameterType="com.sungcor.baobiao.entity.Organise">
+        UPDATE SYS_ORGANIZATION SET SORT = SORT - 1  WHERE    PARENT_ID = #{parentID} AND  (SORT >  #{sortID}  AND  SORT &lt;  #{targetSortID} )
+    </update>
+
+    <update id="updateSortAfter1" parameterType="com.sungcor.baobiao.entity.Organise">
+        UPDATE SYS_ORGANIZATION SET SORT = SORT+1  WHERE    PARENT_ID = #{parentID} AND SORT >  #{targetSortID}   AND  SORT &lt;  #{sortID}
+    </update>
+
+    <update id="updateSortAfter2" parameterType="com.sungcor.baobiao.entity.Organise">
+        UPDATE SYS_ORGANIZATION SET SORT = SORT- 1  WHERE    PARENT_ID = #{parentID} AND SORT >  #{sortID}    AND  SORT &lt;=  #{targetSortID}
+    </update>
+
+    <update id="updateSortBeforeAntoherOrg" parameterType="com.sungcor.baobiao.entity.Organise">
+        UPDATE SYS_ORGANIZATION SET SORT = SORT+1  WHERE    PARENT_ID = #{parentID} AND  SORT >=  #{targetSortID}
+    </update>
+
+    <update id="updateSortAfterAntoherOrg" parameterType="com.sungcor.baobiao.entity.Organise">
+        UPDATE SYS_ORGANIZATION SET SORT = SORT+1  WHERE    PARENT_ID = #{parentID} AND  SORT >  #{targetSortID}
+    </update>
+    <select id="getSysIdBy3rdId" parameterType="int" resultType="Object">
+        SELECT ID FROM SYS_ORGANIZATION WHERE 3RDORGANIZATION_ID=#{id}
+    </select>
+
+    <select id="getAll"  resultMap="organiseBeanMap">
+        SELECT *
+        FROM SYS_ORGANIZATION ORDER BY ID
+    </select>
+
+    <select id="findAllChildOrg"  resultMap="organiseBeanMap" parameterType="int">
+        SELECT *
+        FROM SYS_ORGANIZATION WHERE FIND_IN_SET(ID, getChildOrganization(#{id}))
+    </select>
+
+
+    <select id="getOrgsByGovId" parameterType="int" resultMap="organiseBeanMap">
+        SELECT A.* FROM SYS_ORGANIZATION A WHERE A.GOVERNINGUNIT_ID=#{id}
+    </select>
+
+    <select id="getOrgsByCode" parameterType="String" resultMap="organiseBeanMap">
+        SELECT A.* FROM SYS_ORGANIZATION A WHERE A.CODE=#{code}
+    </select>
+
+    <select id="getOrgsByName" parameterType="String" resultMap="organiseBeanMap">
+        SELECT A.* FROM SYS_ORGANIZATION A WHERE A.NAME=#{name}
+    </select>
+
+    <delete id="deleteOrgsByCodes" parameterType="java.util.ArrayList">
+        DELETE FROM SYS_ORGANIZATION WHERE CODE IN
+        <foreach collection="array" item="item" index="index" separator=","  open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.ProcessDefinitionMapper">
+
+    <resultMap id="processDefBeanMap" type="com.sungcor.baobiao.entity.ProcessDefinition">
+        <result property="id" column="ID"/>
+        <result property="processID" column="PROCESS_ID"/>
+        <result property="version" column="VERSION"/>
+        <result property="lock" column="IS_LOCK"/>
+        <result property="creatorID" column="CREATOR_ID"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateorID" column="UPDATEOR_ID"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="using" column="IS_RUNING"/>
+        <result property="jbpmProcessDefID" column="JBPM_PROCESS_DEF_ID"/>
+        <result property="jbpmProcessKEY" column="JBPM_PROCESS_KEY"/>
+        <result property="jbpmProcessDeployID" column="JBPM_PROCESS_DEPLOYMENT_ID"/>
+        <result property="lockedStaff" column="LOCK_STAFFOR_ID"/>
+    </resultMap>
+
+    <select id="get" parameterType="int" resultMap="processDefBeanMap">
+        SELECT *
+        FROM BPM_PROCESS_VERSION
+        WHERE ID=#{id}
+    </select>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM BPM_PROCESS_VERSION WHERE ID = #{id};
+    </delete>
+
+
+    <insert id="save" parameterType="com.sungcor.baobiao.entity.ProcessDefinition"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BPM_PROCESS_VERSION (PROCESS_ID, VERSION, IS_LOCK , CREATOR_ID , CREATE_TIME ,
+        UPDATEOR_ID,UPDATE_TIME,IS_RUNING, JBPM_PROCESS_DEF_ID,
+        LOCK_STAFFOR_ID,JBPM_PROCESS_KEY,JBPM_PROCESS_DEPLOYMENT_ID)
+        VALUES (#{processID}, #{version}, #{lock} , #{creatorID} , #{createTime} , #{updateorID} , #{updateTime},
+        #{using},#{jbpmProcessDefID},#{lockedStaff},#{jbpmProcessKEY},#{jbpmProcessDeployID})
+    </insert>
+    <update id="update" parameterType="com.sungcor.baobiao.entity.ProcessDefinition">
+        UPDATE BPM_PROCESS_VERSION
+        <set>
+            <if test="updateorID != null">UPDATEOR_ID=#{updateorID},</if>
+            <if test="updateTime != null">UPDATE_TIME=#{updateTime},</if>
+            <if test="using != null">IS_RUNING=#{using},</if>
+            <if test="lock != null">IS_LOCK=#{lock},</if>
+            <if test="lockedStaff != null">LOCK_STAFFOR_ID=#{lockedStaff},</if>
+            <if test="jbpmProcessKEY != null">JBPM_PROCESS_KEY=#{jbpmProcessKEY},</if>
+            <if test="jbpmProcessDefID != null">JBPM_PROCESS_DEF_ID=#{jbpmProcessDefID},</if>
+            <if test="jbpmProcessDeployID != null">JBPM_PROCESS_DEPLOYMENT_ID=#{jbpmProcessDeployID},</if>
+            <if test="processID != null">PROCESS_ID=#{processID},</if>
+            <if test="version != null">VERSION=#{version},</if>
+
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+
+    <select id="listProcessDefByPid" parameterType="Map" resultMap="processDefBeanMap">
+        SELECT *
+        FROM BPM_PROCESS_VERSION
+        WHERE PROCESS_ID = #{processID}
+        ORDER BY VERSION DESC
+        <if test="beginRow != null and pageRowCnt != null">
+            LIMIT #{beginRow},#{pageRowCnt}
+        </if>
+    </select>
+
+
+    <select id="getProcessDefCountByPid" parameterType="Map" resultType="int">
+        SELECT COUNT(*)
+        FROM BPM_PROCESS_VERSION
+        WHERE PROCESS_ID = #{processID}
+    </select>
+
+    <select id="getProcessDefinitionByPinAndVersion" parameterType="Map" resultMap="processDefBeanMap">
+        SELECT bpv.*
+        FROM BPM_PROCESS_VERSION bpv JOIN BPM_PROCESS bp ON bpv.PROCESS_ID = bp.ID
+        WHERE bp.PIN=#{pin} AND bpv.VERSION=#{version}
+    </select>
+
+</mapper>

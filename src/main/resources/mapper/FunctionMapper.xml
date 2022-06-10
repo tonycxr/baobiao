@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.FunctionMapper">
+    <resultMap id="menuBean" type="com.sungcor.baobiao.entity.MenuBean">
+        <result property="code" column="CODE" />
+        <result property="name" column="NAME" />
+        <result property="type" column="TYPE" />
+        <result property="parent" column="PARENT" />
+        <result property="sort" column="SORT" />
+        <result property="icon" column="ICON" />
+        <result property="address" column="OPEN_ADDRESS" />
+        <result property="empower" column="EMPOWER" />
+        <result property="width" column="WIDTH" />
+        <result property="height" column="HEIGHT" />
+        <result property="available" column="AVAILABLE" />
+    </resultMap>
+
+    <insert id="insertFunction" parameterType="com.sungcor.baobiao.entity.Function" >
+        insert into SYS_FUNCTION (code, name, type , parent , sort , icon , open_model ,
+                                  open_address , width , height , available , EMPOWER)
+        values (#{code}, #{name}, #{type} , #{parent} , #{sn} , #{icon} , #{open_model} ,
+                #{open_address} , #{width} , #{height} , #{available} , #{empower})
+    </insert>
+    <!--自定义模板权限-->
+    <insert id="insertFunctionPrivilege" parameterType="com.sungcor.baobiao.entity.Function" >
+        insert into SYS_FUNCTION (CODE, NAME, TYPE , PARENT , SORT,EMPOWER , AVAILABLE)
+        values (#{code}, #{name}, #{type} , #{parent} ,#{sn},#{empower} ,#{available})
+    </insert>
+    <insert id="insertFunctionByModel" parameterType="int" >
+        REPLACE INTO SYS_FUNCTION (CODE, NAME, TYPE , PARENT , SORT , ICON , OPEN_MODEL ,
+		                          OPEN_ADDRESS , WIDTH , HEIGHT , AVAILABLE , EMPOWER)
+        SELECT T1.CODE,T1.NAME,'2',T2.CODE,T1.ID,'../../images/menu_icon/fwtbaobiao.png',NULL,
+               CONCAT('/customReport/mainCustomReportAction.action?modelId=',T1.ID),
+               800,600,'1','3' FROM REPORT_MODEL_T T1 LEFT JOIN REPORT_GROUP_T T2 ON T1.GROUP_ID = T2.ID
+        WHERE T1.ID = #{reportModelId}
+    </insert>
+
+    <insert id="insertReportGroupFunction"  >
+        INSERT INTO SYS_FUNCTION (CODE, NAME, TYPE , PARENT , SORT , ICON , OPEN_MODEL ,
+                                  OPEN_ADDRESS , WIDTH , HEIGHT , AVAILABLE , EMPOWER)
+        SELECT T1.CODE,T1.NAME,'1','customReport',T1.ID,'../../images/menu_icon/fwtbaobiao.png',null,null,800,600,'1','3'
+        FROM REPORT_GROUP_T T1
+    </insert>
+    <insert id="insertSysconfigFunction"  >
+        INSERT INTO SYS_FUNCTION (CODE, NAME, TYPE , PARENT , SORT , ICON , OPEN_MODEL ,
+                                  OPEN_ADDRESS , WIDTH , HEIGHT , AVAILABLE , EMPOWER)
+        SELECT T1.CODE,T1.NAME,'2',T1.ICON,T1.ID,'../../images/menu_icon/9-fenleiguanli.png',null,T1.OPEN_ADDRESS,800,600,'1','3'
+        FROM CMDB_SYS_CONFIGURATION T1
+    </insert>
+    <insert id="insertReportModelFunction"  >
+        INSERT INTO SYS_FUNCTION (CODE, NAME, TYPE , PARENT , SORT , ICON , OPEN_MODEL ,
+                                  OPEN_ADDRESS , WIDTH , HEIGHT , AVAILABLE , EMPOWER)
+        SELECT T1.CODE,T1.NAME,'2',T2.CODE,T1.ID,'../../images/menu_icon/fwtbaobiao.png',NULL,
+               CONCAT('/customReport/mainCustomReportAction.action?modelId=',T1.ID),800,600,'1','3'
+        FROM REPORT_MODEL_T T1 LEFT JOIN REPORT_GROUP_T T2 ON T1.GROUP_ID = T2.ID
+        WHERE T1.STATUS = '1'
+    </insert>
+
+    <delete id="deleteReportGroupFunction" parameterType="list">
+        DELETE FROM SYS_FUNCTION WHERE PARENT = 'customReport' AND SORT IN
+        <foreach item="ids" index="index" collection="list" open="(" separator="," close=")">
+            #{ids}
+        </foreach>
+    </delete>
+
+    <delete id="deleteReportConfigFunction" parameterType="Map">
+        DELETE FROM SYS_FUNCTION WHERE CODE = #{code}
+    </delete>
+    <delete id="deleteReportModelFunction" parameterType="list">
+        DELETE FROM SYS_FUNCTION WHERE PARENT like CONCAT('customReport_reportGroup_','%') AND SORT IN
+        <foreach item="ids" index="index" collection="list" open="(" separator="," close=")">
+            #{ids}
+        </foreach>
+    </delete>
+
+    <delete id="deleteFunctionByModel" parameterType="int">
+        DELETE FROM SYS_FUNCTION WHERE CODE IN (SELECT CODE FROM REPORT_MODEL_T WHERE ID = #{reportModelId})
+    </delete>
+
+    <delete id="deleteAllFunction">
+        delete from SYS_FUNCTION;
+    </delete>
+
+<!--    <select id="findFunctionType" resultType="hashMap">-->
+<!--        select a.code , a.name , a.type , a.parent , a.sort as sn-->
+<!--             , a.icon , a.open_model , a.open_address-->
+<!--             , a.width , a.height-->
+<!--        from SYS_FUNCTION a-->
+<!--        where a.available = '1'-->
+<!--          and a.type='1'-->
+<!--    </select>-->
+    <select id="getisfunllparent" resultType="hashMap">
+        SELECT a.code , a.name , a.type , a.parent from SYS_FUNCTION a WHERE ISNULL(PARENT) ORDER BY SORT
+    </select>
+    <select id="findFunctionByUser" parameterType="hashMap" resultType="hashMap">
+        select a.code , a.name , a.type , IFNULL(a.parent,"") AS parent, a.sort as sn
+        , a.icon , a.open_model as model , a.open_address as address
+        , a.width , a.height
+        from SYS_FUNCTION a
+        WHERE a.available = '1'
+        <if test="loginName=='admin'"> and 1=1 </if>
+        <if test="loginName == 'system'">
+            AND (
+            a.type = '1'
+            OR
+            a.EMPOWER='1'
+            OR
+            a.EMPOWER='2'
+            OR
+            a.EMPOWER='4'
+            )
+        </if>
+        <if test="loginName !=  'admin' and loginName !=  'system'">
+            AND (
+            a.type = '1'
+            OR
+            a.EMPOWER='1'
+            OR
+            (
+            (a.EMPOWER='3' OR a.EMPOWER='4')
+            AND
+            (a.type='2' or a.type='3')
+            AND
+            EXISTS (
+            SELECT 1 FROM SYS_ROLE_FUNCTION b
+            JOIN SYS_USER_ROLE c ON b.ROLE_ID = c.ROLE_ID
+            WHERE b.FUNCTION_CODE = a.CODE AND c.USER_ID=#{userid}
+            )
+            )
+            )
+        </if>
+        order by a.sort,a.type
+    </select>
+
+<!--    <select id="findFunctionByUserItsm" parameterType="hashMap" resultMap="menuBean">-->
+<!--        select a.code as CODE, a.name as NAME, a.type as TYPE, a.parent as PARENT, a.sort as SORT-->
+<!--        , a.icon as ICON, a.open_model as model , a.open_address as ADDRESS-->
+<!--        , a.width as WIDTH, a.height as HEIGHT-->
+<!--        from SYS_FUNCTION a-->
+<!--        WHERE a.available = '1'-->
+<!--        <if test="loginName=='admin'"> and 1=1 </if>-->
+<!--        <if test="loginName == 'system'">-->
+<!--            AND (-->
+<!--            a.type = '1'-->
+<!--            OR-->
+<!--            a.EMPOWER='1'-->
+<!--            OR-->
+<!--            a.EMPOWER='2'-->
+<!--            OR-->
+<!--            a.EMPOWER='4'-->
+<!--            )-->
+<!--        </if>-->
+<!--        <if test="loginName !=  'admin' and loginName !=  'system'">-->
+<!--            AND (-->
+<!--            a.type = '1'-->
+<!--            OR-->
+<!--            a.EMPOWER='1'-->
+<!--            OR-->
+<!--            (-->
+<!--            (a.EMPOWER='3' OR a.EMPOWER='4')-->
+<!--            AND-->
+<!--            (a.type='2' or a.type='3')-->
+<!--            AND-->
+<!--            EXISTS (-->
+<!--            SELECT 1 FROM SYS_ROLE_FUNCTION b-->
+<!--            JOIN SYS_USER_ROLE c ON b.ROLE_ID = c.ROLE_ID-->
+<!--            WHERE b.FUNCTION_CODE = a.CODE AND c.USER_ID=#{userid}-->
+<!--            )-->
+<!--            )-->
+<!--            )-->
+<!--        </if>-->
+<!--        <if test="stsmAndTMCM!=null">-->
+<!--            AND a.TYPE!='3'-->
+<!--        </if>-->
+<!--        order by a.sort,a.type-->
+<!--    </select>-->
+    <!--
+
+where a.available = '1'
+
+<if test="userid == -1">
+   AND (
+           a.type = '1'
+           OR
+           a.EMPOWER='1'
+           OR
+           a.EMPOWER='2'
+           OR
+           a.EMPOWER='4'
+       )
+</if>
+<if test="userid != -1">
+  and (
+        a.type = '1'
+        OR
+        a.EMPOWER='1'
+        OR(
+              (a.EMPOWER='3' OR a.EMPOWER='4')
+              AND
+             (a.type='2' or a.type='3')
+             and exists ( select 1 from SYS_USER_FUNCTION b where a.code = b.menu_code and b.userid = #{userid} )
+          )
+      )
+</if>
+-->
+<!--    <resultMap type="hashMap" id="userFunctionsMap">-->
+<!--        <result property="code" column="CODE" />-->
+<!--        <result property="name" column="NAME" />-->
+<!--        <result property="parent" column="PARENT" />-->
+<!--        <result property="userCode" column="MENU_CODE" />-->
+<!--        <result property="type" column="TYPE" />-->
+<!--        <result property="empower" column="EMPOWER" />-->
+<!--    </resultMap>-->
+
+    <select id="getUserFunctionsByCode" parameterType="hashMap" resultType="Map">
+        select a.CODE as code, a.NAME as name
+        from SYS_FUNCTION a
+        WHERE
+        <if test="userId=='-2'"> a.CODE=#{code} </if>
+        <if test="userId!='-2'">
+            (
+            EXISTS (
+            SELECT 1 FROM SYS_USER_FUNCTION b
+            WHERE b.USERID = #{userId} AND b.MENU_CODE=a.CODE
+            )
+            OR
+            EXISTS (
+            SELECT 1 FROM SYS_ROLE_FUNCTION b
+            JOIN SYS_USER_ROLE c ON b.ROLE_ID = c.ROLE_ID
+            WHERE b.FUNCTION_CODE = a.CODE AND c.USER_ID=#{userId}
+            )
+            )
+            AND a.CODE=#{code}
+        </if>
+    </select>
+
+<!--    <select id="getUserFunctions" parameterType="hashMap" resultMap="userFunctionsMap">-->
+<!--        select a.CODE, a.NAME, a.PARENT, a.TYPE, a.EMPOWER, b.MENU_CODE from SYS_FUNCTION a left join (-->
+<!--            select MENU_CODE from SYS_USER_FUNCTION where USERID = #{userId}-->
+<!--            UNION-->
+<!--            select FUNCTION_CODE from SYS_ROLE_FUNCTION c inner join (-->
+<!--                select ROLE_ID from SYS_USER_ROLE where USER_ID = #{userId}-->
+<!--            ) d on c.ROLE_ID = d.ROLE_ID-->
+<!--        ) b on a.CODE = b.MENU_CODE where AVAILABLE = "1" order by a.SORT ASC;-->
+<!--    </select>-->
+
+    <insert id="insertRoleFunction" parameterType="hashMap">
+        insert into SYS_ROLE_FUNCTION (ROLE_ID, FUNCTION_CODE) values (#{roleId}, #{functionCode})
+    </insert>
+
+    <delete id="deleteRoleFunction" parameterType="hashMap">
+        delete from SYS_ROLE_FUNCTION where ROLE_ID = #{roleId};
+    </delete>
+
+<!--    <resultMap type="hashMap" id="roleFunctionsMap">-->
+<!--        <result property="code" column="CODE" />-->
+<!--        <result property="name" column="NAME" />-->
+<!--        <result property="parent" column="PARENT" />-->
+<!--        <result property="userCode" column="FUNCTION_CODE" />-->
+<!--        <result property="type" column="TYPE" />-->
+<!--    </resultMap>-->
+<!--    <select id="getRoleFunctions" parameterType="hashMap" resultMap="roleFunctionsMap">-->
+<!--        <choose>-->
+<!--            <when test="_Q_ONLY">-->
+<!--                select FUNCTION_CODE from SYS_ROLE_FUNCTION where ROLE_ID = #{roleId}-->
+<!--            </when>-->
+<!--            <otherwise>-->
+<!--                select a.CODE, a.NAME, a.TYPE, a.PARENT, b.FUNCTION_CODE from SYS_FUNCTION a left join (select * from SYS_ROLE_FUNCTION where 1=1-->
+<!--                <if test="roleId != null">-->
+<!--                    and ROLE_ID = #{roleId}-->
+<!--                </if>) b on b.FUNCTION_CODE = a.CODE where a.AVAILABLE = "1" order by a.SORT ASC;-->
+<!--            </otherwise>-->
+<!--        </choose>-->
+
+<!--    </select>-->
+
+</mapper>

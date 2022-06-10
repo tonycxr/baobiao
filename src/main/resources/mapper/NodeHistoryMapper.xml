@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.NodeHistoryMapper">
+
+    <resultMap id="nodeHistoryBeanMap" type="com.sungcor.baobiao.entity.NodeHistory">
+        <result property="id" column="ID" />
+        <result property="nodeName" column="NODE_NAME" />
+        <result property="implementerID" column="IMPLEMENTER_ID" />
+        <result property="implementGroupID" column="IMPLEMENT_GROUP_ID" />
+<!--        <result property="implementRoleType" column="IMPLEMENT_ROLE_TYPE"   />-->
+        <result property="startTime" column="START_TIME" />
+        <result property="endTime" column="END_TIME" />
+        <result property="responseTime" column="RESPONSE_TIME" />
+        <result property="status" column="STATUS" />
+        <result property="processInstanceID" column="PROCESS_INSTANCE_ID" />
+        <result property="runFlag" column="RUN_FLAG" />
+        <result property="nodeInstanceID" column="NODE_INSTANCE_ID" />
+        <result property="preNodeHistoryID" column="PRE_NODEHISTORY_ID" />
+        <result property="asideFlag" column="ASIDE_FLAG" />
+        <result property="decisionFlag" column="DECISION_FLAG" />
+        <result property="timerFlag" column="TIMER_FLAG" />
+        <result property="includedDeal" column="INCLUDED_DEAL" />
+        <result property="dealFlag" column="DEAL_FLAG" />
+        <result property="hasLinkProcess" column="HASLINKPROCESS" />
+        <result property="hacFlag" column="HACFLAG" />
+        <result property="relatedCI" column="RELATEDCI_FLAG" />
+        <result property="roleByarea" column="ROLE_BY_AREA_FLAG" />
+        <result property="asideAuditor" column="ASIDE_AUDITOR" />
+        <result property="asideAuditorGroup" column="ASIDE_GROUP" />
+        <result property="asideAuditMinutes" column="ASIDE_AUDIT_MINUTES" />
+        <result property="preNodeHistoryId" column="PRE_NODEHISTORY_ID" />
+    </resultMap>
+
+
+
+    <select id="get" parameterType="int" resultMap="nodeHistoryBeanMap">
+        SELECT  *
+        FROM BPM_NODE_HISTORY
+        WHERE ID=#{id}
+    </select>
+
+    <select id="getByPIDAndNodeInsID" parameterType="Map" resultMap="nodeHistoryBeanMap">
+        SELECT  *
+        FROM BPM_NODE_HISTORY
+        WHERE PROCESS_INSTANCE_ID=#{processInstanceID} AND NODE_INSTANCE_ID=#{nodeInstanceID}
+          AND RUN_FLAG = 0
+        ORDER BY ID DESC
+    </select>
+
+    <select id="getNoRunByPIDAndNodeName" parameterType="Map" resultMap="nodeHistoryBeanMap">
+        SELECT  *
+        FROM BPM_NODE_HISTORY
+        WHERE PROCESS_INSTANCE_ID=#{processInstanceID} AND NODE_NAME=#{nodeName}
+          AND RUN_FLAG = 0
+        ORDER BY ID DESC
+    </select>
+
+    <select id="getRunNodeHiss" parameterType="Map" resultMap="nodeHistoryBeanMap">
+        SELECT  *
+        FROM BPM_NODE_HISTORY
+        WHERE NODE_NAME=#{nodeName} and PROCESS_INSTANCE_ID=#{processInstanceID} AND RUN_FLAG=1  ORDER BY END_TIME DESC
+    </select>
+
+    <select id="getNodeHiss" parameterType="Map" resultMap="nodeHistoryBeanMap">
+        SELECT  *
+        FROM BPM_NODE_HISTORY
+        WHERE NODE_NAME=#{nodeName} and PROCESS_INSTANCE_ID=#{processInstanceID} ORDER BY END_TIME DESC
+    </select>
+
+    <select id="getByRunFlagAndNodeInstnce" parameterType="Map" resultMap="nodeHistoryBeanMap">
+        SELECT  *
+        FROM BPM_NODE_HISTORY
+        WHERE  NODE_INSTANCE_ID=#{nodeInstanceID} AND RUN_FLAG=#{runFlag}  ORDER BY END_TIME DESC
+    </select>
+
+    <insert id="save" parameterType="com.sungcor.baobiao.entity.NodeHistory" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BPM_NODE_HISTORY (NODE_NAME, IMPLEMENTER_ID, IMPLEMENT_GROUP_ID , IMPLEMENT_ROLE_TYPE , START_TIME , END_TIME,
+                                      RESPONSE_TIME,STATUS, PROCESS_INSTANCE_ID, RUN_FLAG, NODE_INSTANCE_ID , PRE_NODEHISTORY_ID,ASIDE_FLAG,DECISION_FLAG,
+                                      TIMER_FLAG,INCLUDED_DEAL,DEAL_FLAG, HASLINKPROCESS,HACFLAG,RELATEDCI_FLAG,ROLE_BY_AREA_FLAG,ASIDE_AUDITOR,ASIDE_GROUP,ASIDE_AUDIT_MINUTES)
+        VALUES (#{nodeName}, #{implementerID}, #{implementGroupID} , #{execRoleType} , #{startTime} , #{endTime} , #{responseTime},
+                #{status},#{processInstanceID},#{runFlag},#{nodeInstanceID},#{preNodeHistoryID},#{asideFlag},#{decisionFlag},#{timerFlag},
+                #{includedDeal} ,#{dealFlag},#{hasLinkProcess},#{hacFlag},#{relatedCI},#{roleByarea},#{asideAuditor},#{asideAuditorGroup},#{asideAuditMinutes})
+    </insert>
+
+    <update id="update" parameterType="com.sungcor.baobiao.entity.NodeHistory">
+        UPDATE BPM_NODE_HISTORY
+        <set>
+            <if test="implementerID != null">IMPLEMENTER_ID=#{implementerID},</if>
+            <if test="implementGroupID != null">IMPLEMENT_GROUP_ID=#{implementGroupID},</if>
+            <if test="startTime != null">START_TIME=#{startTime},</if>
+            <if test="endTime != null">END_TIME=#{endTime},</if>
+            <if test="responseTime != null">RESPONSE_TIME=#{responseTime},</if>
+            <if test="runFlag != null">RUN_FLAG=#{runFlag},</if>
+            <if test="status != null">STATUS=#{status},</if>
+            <if test="preNodeHistoryID != null">PRE_NODEHISTORY_ID=#{preNodeHistoryID},</if>
+            <if test="implementRoleType != null">IMPLEMENT_ROLE_TYPE=#{implementRoleType},</if>
+            <if test="asideAuditor != null">ASIDE_AUDITOR=#{asideAuditor},</if>
+            <if test="asideAuditorGroup != null">ASIDE_GROUP=#{asideAuditorGroup},</if>
+            <if test="asideAuditMinutes != null">ASIDE_AUDIT_MINUTES=#{asideAuditMinutes},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM BPM_NODE_HISTORY WHERE ID = #{id}
+    </delete>
+
+    <select id="listNodeHisByProInsID" parameterType="int" resultMap="nodeHistoryBeanMap">
+        SELECT  *
+        FROM BPM_NODE_HISTORY
+        WHERE PROCESS_INSTANCE_ID=#{id}
+    </select>
+    <select id="listNodeHisRunning" parameterType="int" resultMap="nodeHistoryBeanMap">
+        SELECT  *
+        FROM BPM_NODE_HISTORY
+        WHERE PROCESS_INSTANCE_ID=#{instanceId}
+          AND RUN_FLAG = '1'
+    </select>
+
+    <select id="listNodeHisAside" parameterType="int" resultMap="nodeHistoryBeanMap">
+        SELECT  *
+        FROM BPM_NODE_HISTORY
+        WHERE PROCESS_INSTANCE_ID=#{instanceId}
+          AND STATUS = '5'
+    </select>
+
+</mapper>

@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.ServiceProductMapper">
+
+    <resultMap id="serviceProductBeanMap" type="com.sungcor.baobiao.entity.ServiceProduct">
+        <result property="id" column="ID" />
+        <result property="code" column="CODE" />
+        <result property="serviceCategoryId" column="SERVICE_CATEGORY_ID" />
+        <result property="productGroupId" column="PRODUCT_GROUP_ID" />
+        <result property="organizationId" column="ORGANIZATION_ID" />
+        <result property="name" column="NAME" />
+        <result property="description" column="DESCRIPTION" />
+        <result property="flowId" column="FLOW_ID" />
+        <result property="icon" column="ICON" />
+        <result property="status" column="STATUS" />
+        <result property="createUser" column="CREATE_USER" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="modifyUser" column="MODIFY_USER" />
+        <result property="modifyTime" column="MODIFY_TIME" />
+        <result property="itsqmSPCode" column="ITSQM_SP_CODE" />
+        <result property="itsqmServiceCalssify" column="ITSQM_SERVICE_CLASSIFY" />
+        <result property="itsqmServiceType" column="ITSQM_SERVICE_TYPE" />
+        <result property="itsqmSPID" column="ITSQM_SP_ID" />
+    </resultMap>
+
+    <resultMap id="serviceProductAuthBeanMap" type="com.sungcor.baobiao.entity.ServiceProductAuth">
+        <result property="serviceProductId" column="SERVICEPRODUCT_ID" />
+        <result property="organizationId" column="ORGANIZATION_ID" />
+        <result property="canUse" column="CAN_USE" />
+        <result property="canQuery" column="CAN_QUERY" />
+    </resultMap>
+
+    <resultMap id="serviceProductRegionBeanMap" type="com.sungcor.baobiao.entity.ServiceProductRegion">
+        <result property="serviceProductId" column="SERVICEPRODUCT_ID" />
+<!--        <result property="regionId" column="REGION_ID" />-->
+        <result property="canUse" column="CAN_USE" />
+        <result property="canQuery" column="CAN_QUERY" />
+    </resultMap>
+
+    <resultMap id="codeItemMap" type="com.sungcor.baobiao.entity.CodeItem">
+        <result property="name" column="version" />
+        <result property="id" column="id" />
+    </resultMap>
+
+    <resultMap id="serviceProductProcessInstanceBeanMap" type="com.sungcor.baobiao.entity.ServiceProductProcessInstance">
+        <result property="id" column="ID" />
+        <result property="serviceProductId" column="SERVICEPRODUCT_ID" />
+        <result property="processInstanceId" column="PROCESSINSTANCE_ID" />
+    </resultMap>
+
+
+    <select id="getServiceProductCount" parameterType="hashMap"  resultType="hashMap">
+        SELECT COUNT(a.ID) AS serviceProductCount FROM (
+        SELECT SP.* FROM SF_SERVICE_PRODUCT SP INNER JOIN SF_SERVICE_PRODUCT_REGION SSPR ON SSPR.SERVICEPRODUCT_ID=SP.ID
+        WHERE  1 = 1
+        <if test="userRegionIds != null">
+            AND REGION_ID IN
+            <foreach item="item" index="index" collection="userRegionIds"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="userRegionIds == null">
+            AND REGION_ID IS NULL
+        </if>
+        <if test="array != null">
+            AND  SP.id IN
+            <foreach item="item" index="index" collection="array"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="name != null">AND NAME LIKE CONCAT('%','${name}','%')</if>
+        <if test="productGroupId != null">AND PRODUCT_GROUP_ID=#{productGroupId}</if>
+        <if test="serviceCategoryId != null">AND SERVICE_CATEGORY_ID=#{serviceCategoryId}</if>
+        <!--<if test="slaFlag != null">AND (SERVICE_CATEGORY_ID=1 OR SERVICE_CATEGORY_ID=2)</if>-->
+        UNION
+        SELECT SP.* FROM SF_SERVICE_PRODUCT SP
+        WHERE 1=1
+        <if test="userName!=null">
+            AND CREATE_USER=#{userName}
+        </if>
+        <if test="name != null">AND NAME LIKE CONCAT('%','${name}','%')</if>
+        <if test="productGroupId != null">AND PRODUCT_GROUP_ID=#{productGroupId}</if>
+        <if test="serviceCategoryId != null">AND SERVICE_CATEGORY_ID=#{serviceCategoryId}</if>
+        <!--<if test="slaFlag != null">AND (SERVICE_CATEGORY_ID=1 OR SERVICE_CATEGORY_ID=2)</if>-->
+        GROUP BY SP.ID)a
+    </select>
+
+    <select id="getServiceProduct" resultMap="serviceProductBeanMap">
+        SELECT id,name,FLOW_ID as flowId  FROM SF_SERVICE_PRODUCT where STATUS = 1
+    </select>
+
+<!--    <select id="getServiceVersion" parameterType="Integer"  resultMap="codeItemMap">-->
+<!--        select DISTINCT bpv.id ,bpv.VRESION from BPM_PROCESS_VERSION bpv,SF_SERVICE_PRODUCT sp where sp.id=#{productID} and bpv.process_id =sp.flow_id-->
+<!--    </select>-->
+
+    <select id="getServiceProductPaging" parameterType="hashMap"  resultMap="serviceProductBeanMap">
+        SELECT SP.* FROM SF_SERVICE_PRODUCT SP INNER JOIN SF_SERVICE_PRODUCT_REGION SSPR ON SSPR.SERVICEPRODUCT_ID=SP.ID
+        WHERE 1 = 1
+        <if test="userRegionIds != null">
+            AND  SSPR.REGION_ID IN
+            <foreach item="item" index="index" collection="userRegionIds"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="userRegionIds == null">
+            AND  SSPR.REGION_ID IS NULL
+        </if>
+        <if test="array != null">
+            AND  SP.id IN
+            <foreach item="item" index="index" collection="array"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="name != null">AND NAME LIKE CONCAT('%','${name}','%')</if>
+        <if test="productGroupId != null">AND PRODUCT_GROUP_ID=#{productGroupId}</if>
+        <if test="serviceCategoryId != null">AND SERVICE_CATEGORY_ID=#{serviceCategoryId}</if>
+        <!--<if test="slaFlag != null">AND (SERVICE_CATEGORY_ID=1 OR SERVICE_CATEGORY_ID=2)</if>-->
+        UNION
+        SELECT SP.* FROM SF_SERVICE_PRODUCT SP
+        WHERE 1=1
+        <if test="userName!=null">
+            AND CREATE_USER=#{userName}
+        </if>
+        <if test="array != null">
+            AND  SP.id IN
+            <foreach item="item" index="index" collection="array"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="name != null">AND NAME LIKE CONCAT('%','${name}','%')</if>
+        <if test="productGroupId != null">AND PRODUCT_GROUP_ID=#{productGroupId}</if>
+        <if test="serviceCategoryId != null">AND SERVICE_CATEGORY_ID=#{serviceCategoryId}</if>
+        <!--<if test="slaFlag != null">AND (SERVICE_CATEGORY_ID=1 OR SERVICE_CATEGORY_ID=2)</if>-->
+        GROUP BY SP.ID
+        ORDER BY ID
+        <if test="beginRow != null and pageRowCnt != null">
+            LIMIT #{beginRow},#{pageRowCnt}
+        </if>
+    </select>
+
+    <select id="queryAuthServiceProducts" parameterType="hashMap" resultMap="serviceProductBeanMap">
+        SELECT SP.* FROM SF_SERVICE_PRODUCT SP
+        LEFT JOIN SF_SERVICE_PRODUCT_REGION t on SP.ID = t.SERVICEPRODUCT_ID
+        WHERE SP.STATUS = 1
+        <if test="userRegionIds != null">
+            AND t.REGION_ID IN
+            <foreach item="item" index="index" collection="userRegionIds"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="userRegionIds == null">
+            AND t.REGION_ID IS NULL
+        </if>
+        <if test="name != null">AND NAME LIKE  '%'||'${name}'||'%'</if>
+        <if test="productGroupId != null">AND PRODUCT_GROUP_ID=#{productGroupId}</if>
+        <if test="serviceCategoryId != null">AND SERVICE_CATEGORY_ID=#{serviceCategoryId}</if>
+        UNION
+        SELECT SP.* FROM SF_SERVICE_PRODUCT SP
+        WHERE CREATE_USER=#{userName}
+        <if test="name != null">AND NAME LIKE  '%'||'${name}'||'%'</if>
+        <if test="productGroupId != null">AND PRODUCT_GROUP_ID=#{productGroupId}</if>
+        <if test="serviceCategoryId != null">AND SERVICE_CATEGORY_ID=#{serviceCategoryId}</if>
+        GROUP BY SP.ID
+    </select>
+
+    <select id="getServiceProducts" parameterType="hashMap"  resultMap="serviceProductBeanMap">
+        SELECT SP.* FROM SF_SERVICE_PRODUCT SP INNER JOIN SF_SERVICE_PRODUCT_REGION SSPR ON SP.ID=SSPR.SERVICEPRODUCT_ID
+        WHERE SP.STATUS = 1
+        <if test="userRegionIds != null">
+            AND SSPR.REGION_ID IN
+            <foreach item="item" index="index" collection="userRegionIds"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <!--<if test="userRegionIds == null">
+            AND SSPR.REGION_ID IS NULL
+        </if>-->
+        <if test="name != null">AND NAME LIKE CONCAT('%','${name}','%')</if>
+        <if test="productGroupId != null">AND PRODUCT_GROUP_ID=#{productGroupId}</if>
+        <if test="serviceCategoryId != null">AND SERVICE_CATEGORY_ID=#{serviceCategoryId}</if>
+        <if test="importFlag==null">
+            UNION
+            SELECT SP.* FROM SF_SERVICE_PRODUCT SP
+            WHERE SP.STATUS = 1
+            AND CREATE_USER=#{userName}
+            <if test="name != null">AND NAME LIKE CONCAT('%','${name}','%')</if>
+            <if test="productGroupId != null">AND PRODUCT_GROUP_ID=#{productGroupId}</if>
+            <if test="serviceCategoryId != null">AND SERVICE_CATEGORY_ID=#{serviceCategoryId}</if>
+        </if>
+        GROUP BY SP.ID
+    </select>
+
+    <insert id="insertServiceProduct" parameterType="com.sungcor.baobiao.entity.ServiceProduct" >
+        INSERT INTO SF_SERVICE_PRODUCT(CODE,SERVICE_CATEGORY_ID,PRODUCT_GROUP_ID,ORGANIZATION_ID,NAME,DESCRIPTION,FLOW_ID,ICON,
+        STATUS,CREATE_USER,CREATE_TIME,MODIFY_USER,MODIFY_TIME,ITSQM_SP_CODE,ITSQM_SERVICE_CLASSIFY,ITSQM_SERVICE_TYPE,ITSQM_SP_ID)
+        VALUES(#{code},#{serviceCategoryId},#{productGroupId},#{organizationId} , #{name},
+        #{description},#{flowId},#{icon},#{status},#{createUser},#{createTime},#{modifyUser},#{modifyTime},#{itsqmSPCode},#{itsqmServiceCalssify},#{itsqmServiceType},#{itsqmSPID})
+        <selectKey resultType="int" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <update id="updateServiceProduct" parameterType="com.sungcor.baobiao.entity.ServiceProduct">
+        UPDATE SF_SERVICE_PRODUCT
+        <set>
+            <if test="serviceCategoryId != null">SERVICE_CATEGORY_ID=#{serviceCategoryId},</if>
+            <if test="productGroupId != null">PRODUCT_GROUP_ID=#{productGroupId},</if>
+            <if test="name != null">NAME=#{name},</if>
+            <if test="description != null">DESCRIPTION=#{description},</if>
+            <if test="flowId != null">FLOW_ID=#{flowId},</if>
+            <if test="icon != null">ICON=#{icon},</if>
+            <if test="status != null">STATUS=#{status},</if>
+            <if test="modifyUser != null">MODIFY_USER=#{modifyUser},</if>
+            <if test="modifyTime  != null">MODIFY_TIME =#{modifyTime},</if>
+            <if test="itsqmSPCode != null">ITSQM_SP_CODE=#{itsqmSPCode},</if>
+            <if test="itsqmServiceCalssify != null">ITSQM_SERVICE_CLASSIFY=#{itsqmServiceCalssify},</if>
+            <if test="itsqmServiceType  != null">ITSQM_SERVICE_TYPE=#{itsqmServiceType},</if>
+            <if test="itsqmSPID != null &amp;&amp; itsqmSPID != ''">ITSQM_SP_ID=#{itsqmSPID},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <select id="getServiceProductById" parameterType="Integer" resultMap="serviceProductBeanMap">
+        SELECT * FROM SF_SERVICE_PRODUCT  WHERE ID = #{id}
+    </select>
+
+    <select id="getServiceProductByCode" parameterType="String" resultMap="serviceProductBeanMap">
+        SELECT * FROM SF_SERVICE_PRODUCT  WHERE CODE = #{code}
+    </select>
+
+    <select id="getServiceProductByName" parameterType="String" resultMap="serviceProductBeanMap">
+        SELECT * FROM SF_SERVICE_PRODUCT  WHERE NAME = #{name}
+    </select>
+
+    <select id="getServiceProductByFlowId" parameterType="int" resultMap="serviceProductBeanMap">
+        SELECT * FROM SF_SERVICE_PRODUCT  WHERE FLOW_ID = #{id}
+    </select>
+
+
+    <delete id="deleteServiceProductAuthBySPID" parameterType="Integer">
+        DELETE FROM SF_SERVICE_PRODUCT_AUTH WHERE SERVICEPRODUCT_ID = #{id}
+    </delete>
+
+    <delete id="deleteServiceProductRegionBySPID" parameterType="Integer">
+        DELETE FROM SF_SERVICE_PRODUCT_REGION WHERE SERVICEPRODUCT_ID = #{id}
+    </delete>
+
+    <insert id="insertServiceProductAuth" parameterType="com.sungcor.baobiao.entity.ServiceProductAuth" >
+        INSERT INTO SF_SERVICE_PRODUCT_AUTH
+        VALUES(#{serviceProductId},#{organizationId},#{canUse},#{canQuery})
+        <selectKey resultType="int" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <insert id="insertServiceProductRegion" parameterType="com.sungcor.baobiao.entity.ServiceProductRegion" >
+        INSERT INTO SF_SERVICE_PRODUCT_REGION
+        VALUES(#{serviceProductId},#{regionId},#{canUse},#{canQuery})
+    </insert>
+
+    <select id="getServiceProductRegionsBySPID" parameterType="Integer" resultMap="serviceProductRegionBeanMap">
+        SELECT * FROM SF_SERVICE_PRODUCT_REGION  WHERE SERVICEPRODUCT_ID = #{id}
+    </select>
+
+    <insert id="insertServiceProductProcessInstance" parameterType="com.sungcor.baobiao.entity.ServiceProductProcessInstance" >
+        INSERT INTO SF_SP_PROCESSINSTANCE(SERVICEPRODUCT_ID,PROCESSINSTANCE_ID)
+        VALUES(#{serviceProductId},#{processInstanceId})
+        <selectKey resultType="int" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <delete id="deleteProductProcessInstanceByProductId" parameterType="Integer">
+        DELETE FROM SF_SP_PROCESSINSTANCE WHERE SERVICEPRODUCT_ID = #{id}
+    </delete>
+
+    <update id="updateProductProcessInstance" parameterType="com.sungcor.baobiao.entity.ServiceProduct">
+        UPDATE SF_SP_PROCESSINSTANCE
+        <set>
+            <if test="processInstanceId != null">PROCESSINSTANCE_ID=#{processInstanceId},</if>
+        </set>
+        WHERE SERVICEPRODUCT_ID = #{serviceProductId}
+    </update>
+
+    <select id="checkRelated" parameterType="String" resultType="hashMap" >
+        SELECT NAME as name FROM SF_SERVICE_PRODUCT SSP WHERE SSP.ID = #{productId}
+                                                          AND #{productId} IN (SELECT SEP.SERVICEPRODUCT_ID FROM SC_EVENT_POLICY SEP
+                                                                               UNION SELECT SSP1.SERVICEPRODUCT_ID  FROM
+                                                                                   SF_SP_PROCESSINSTANCE SSP1)
+    </select>
+    <select id="getProductNumbersOnCategory" resultType="hashMap">
+        SELECT SSP.SERVICE_CATEGORY_ID as catid,count(SSP.ID) as count FROM SF_SERVICE_PRODUCT SSP GROUP BY SSP.SERVICE_CATEGORY_ID
+    </select>
+    <delete id="deleteServiceProduct" parameterType="Integer">
+        DELETE FROM SF_SERVICE_PRODUCT WHERE ID = #{id}
+    </delete>
+
+    <select id="getServiceProduceProcessInstance" parameterType="Map"  resultMap="serviceProductProcessInstanceBeanMap">
+        SELECT * FROM SF_SP_PROCESSINSTANCE WHERE 1=1
+        <if test="pid != null"> AND PROCESSINSTANCE_ID=#{pid}</if>
+        <if test="spid != null"> AND SERVICEPRODUCT_ID=#{spid}</if>
+    </select>
+
+    <delete id="deleteServiceProductAuthByPIDAndOrgId" parameterType="Map">
+        DELETE FROM SF_SERVICE_PRODUCT_AUTH  WHERE SERVICEPRODUCT_ID = #{pid} AND ORGANIZATION_ID = #{orgId}
+    </delete>
+
+    <select id="getProductByRegion" parameterType="hashMap" resultMap="serviceProductBeanMap">
+        SELECT * FROM SF_SERVICE_PRODUCT SP
+        INNER JOIN SF_SERVICE_PRODUCT_REGION SSP ON SSP.SERVICEPRODUCT_ID=SP.ID
+        WHERE SSP.REGION_ID=#{regionId}
+        <if test="serviceCategoryID!=null">
+            AND SP.SERVICE_CATEGORY_ID=#{serviceCategoryID}
+        </if>
+    </select>
+</mapper>

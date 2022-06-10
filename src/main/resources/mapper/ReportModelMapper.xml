@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.report.mapper.ReportModelMapper">
+    <resultMap id="reportModelMap" type="com.sungcor.baobiao.report.bean.ReportModelBean">
+        <result property="id" column="ID" />
+        <result property="typeId" column="TYPE_ID" />
+        <result property="typeName" column="TYPE_NAME" />
+        <result property="groupId" column="GROUP_ID" />
+        <result property="groupName" column="GROUP_NAME" />
+        <result property="code" column="CODE" />
+        <result property="name" column="NAME" />
+        <result property="reportName" column="REPORT_NAME" />
+        <result property="status" column="STATUS" />
+        <result property="description" column="DESCRIPTION" />
+        <result property="createUser" column="CREATE_USER" />
+        <result property="createUserName" column="CREATE_USER_NAME" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="modifyUser" column="MODIFY_USER" />
+        <result property="modifyUserName" column="MODIFY_USER_NAME" />
+        <result property="modifyTime" column="MODIFY_TIME" />
+        <result property="serviceCategoryId" column="SERVICE_CATEGORY_ID" />
+        <result property="productId" column="PRODUCT_ID" />
+        <result property="showTable" column="SHOWTABLE" />
+        <result property="showChart" column="SHOWCHART" />
+    </resultMap>
+    <select id="findByName" parameterType="String" resultMap="reportModelMap">
+        SELECT * FROM REPORT_MODEL_T T WHERE T.NAME = #{name}
+    </select>
+    <select id="findListByMap" parameterType="hashMap" resultMap="reportModelMap">
+        SELECT T1.NAME,T1.REPORT_NAME,T2.NAME GROUP_NAME,T3.NAME TYPE_NAME,T1.STATUS,T1.ID,
+        T4.NAME CREATE_USER_NAME,T1.CREATE_TIME,T5.NAME MODIFY_USER_NAME,T1.MODIFY_TIME FROM REPORT_MODEL_T T1
+        LEFT JOIN REPORT_GROUP_T T2 ON T2.ID = T1.GROUP_ID
+        LEFT JOIN REPORT_TYPE_T T3 ON T3.ID = T1.TYPE_ID
+        LEFT JOIN SYS_USER T4 ON T4.ID = T1.CREATE_USER
+        LEFT JOIN SYS_USER T5 ON T5.ID = T1.MODIFY_USER
+        WHERE 1=1
+        <if test="keyWorld != null">
+            AND CONCAT(T1.NAME,',',T2.NAME,',',T4.NAME,',',T5.NAME) LIKE CONCAT('%',#{keyWorld},'%')
+        </if>
+        <if test="reportType != null"> AND T1.TYPE_ID=#{reportType}</if>
+        <if test="reportGroup != null"> AND T1.GROUP_ID=#{reportGroup}</if>
+        LIMIT #{beginRow},#{pageRowCnt}
+
+    </select>
+    <select id="findListByPara" parameterType="hashMap" resultMap="reportModelMap">
+        SELECT T1.NAME,T1.REPORT_NAME,T2.NAME GROUP_NAME,T3.NAME TYPE_NAME,T1.STATUS,T1.ID,
+        T4.NAME CREATE_USER_NAME,T1.CREATE_TIME,T5.NAME MODIFY_USER_NAME,T1.MODIFY_TIME FROM REPORT_MODEL_T T1
+        LEFT JOIN REPORT_GROUP_T T2 ON T2.ID = T1.GROUP_ID
+        LEFT JOIN REPORT_TYPE_T T3 ON T3.ID = T1.TYPE_ID
+        LEFT JOIN SYS_USER T4 ON T4.ID = T1.CREATE_USER
+        LEFT JOIN SYS_USER T5 ON T5.ID = T1.MODIFY_USER
+        WHERE 1=1
+        <if test="reportType != null"> AND T1.TYPE_ID=#{reportType}</if>
+        <if test="reportGroup != null"> AND T1.GROUP_ID=#{reportGroup}</if>
+    </select>
+    <select id="findListCountByMap" parameterType="hashMap" resultType="int">
+        SELECT COUNT(1) FROM REPORT_MODEL_T T1
+        LEFT JOIN REPORT_GROUP_T T2 ON T2.ID = T1.GROUP_ID
+        LEFT JOIN REPORT_TYPE_T T3 ON T3.ID = T1.TYPE_ID
+        LEFT JOIN SYS_USER T4 ON T4.ID = T1.CREATE_USER
+        LEFT JOIN SYS_USER T5 ON T5.ID = T1.MODIFY_USER
+        WHERE 1=1
+        <if test="keyWorld != null">
+            AND CONCAT(T1.NAME,',',T2.NAME,',',T4.NAME,',',T5.NAME) LIKE CONCAT('%',#{keyWorld},'%')
+        </if>
+        <if test="reportType != null"> AND T1.TYPE_ID=#{reportType}</if>
+        <if test="reportGroup != null"> AND T1.GROUP_ID=#{reportGroup}</if>
+
+    </select>
+
+    <select id="findBeanById" parameterType="String" resultMap="reportModelMap">
+        SELECT * FROM REPORT_MODEL_T WHERE ID = #{modelId}
+    </select>
+
+    <update id="updateStatus" parameterType="hashMap">
+        UPDATE REPORT_MODEL_T SET STATUS=#{status} WHERE ID= #{id}
+    </update>
+
+    <update id="updateModel" parameterType="com.sungcor.baobiao.report.bean.ReportModelBean">
+        UPDATE REPORT_MODEL_T SET GROUP_ID=#{groupId},NAME=#{name},REPORT_NAME=#{reportName},DESCRIPTION=#{description},
+                                  MODIFY_USER=#{modifyUser},MODIFY_TIME=now(), SERVICE_CATEGORY_ID=#{serviceCategoryId},
+                                  PRODUCT_ID=#{productId},STATUS=#{status},SHOWTABLE=#{showTable},SHOWCHART=#{showChart}
+        WHERE ID= #{id}
+    </update>
+
+    <update id="updateModelTime" parameterType="hashMap">
+        UPDATE REPORT_MODEL_T SET MODIFY_USER=#{modifyUser},MODIFY_TIME=now()   WHERE ID= #{id}
+    </update>
+
+    <update id="updateModelCode" parameterType="com.sungcor.baobiao.report.bean.ReportModelBean">
+        UPDATE REPORT_MODEL_T SET CODE=#{code}  WHERE ID= #{id}
+    </update>
+
+    <insert id="addFunction" parameterType="hashMap">
+        INSERT INTO SYS_ROLE_FUNCTION (ROLE_ID, FUNCTION_CODE)
+        SELECT #{roleId},CODE FROM REPORT_MODEL_T WHERE ID = #{modelId}
+    </insert>
+
+    <insert id="addGroupFunction" parameterType="hashMap">
+        INSERT INTO SYS_ROLE_FUNCTION (ROLE_ID, FUNCTION_CODE)
+        SELECT #{roleId},T2.CODE FROM REPORT_GROUP_T T2
+                                          LEFT JOIN REPORT_MODEL_T T3 ON T2.ID = T3.GROUP_ID
+        WHERE T3.ID =  #{modelId}
+    </insert>
+
+    <select id="findFunction" parameterType="hashMap" resultType="int">
+        SELECT COUNT(1) FROM SYS_ROLE_FUNCTION T1
+                                 INNER JOIN REPORT_GROUP_T T2 ON T1.FUNCTION_CODE = T2.CODE
+                                 LEFT JOIN REPORT_MODEL_T T3 ON T2.ID = T3.GROUP_ID
+        WHERE T1.ROLE_ID = #{roleId} AND T3.ID = #{modelId}
+    </select>
+
+    <select id="findDeleteFunction" parameterType="hashMap" resultType="int">
+        SELECT COUNT(1) FROM SYS_ROLE_FUNCTION  T1
+                                 INNER JOIN  (SELECT CODE FROM REPORT_MODEL_T WHERE GROUP_ID =
+                                                                                    (SELECT GROUP_ID FROM REPORT_MODEL_T WHERE ID = #{modelId})) T2
+                                             ON T1.FUNCTION_CODE = T2.CODE
+        WHERE T1.ROLE_ID = #{roleId}
+    </select>
+
+    <delete id="deleteGroupFunction" parameterType="hashMap">
+        delete from SYS_ROLE_FUNCTION where ROLE_ID = #{roleId} and FUNCTION_CODE IN
+                                                                    (SELECT T2.CODE FROM REPORT_GROUP_T T2
+                                                                                             LEFT JOIN REPORT_MODEL_T T3 ON T2.ID = T3.GROUP_ID
+                                                                     WHERE T3.ID =  #{modelId})
+    </delete>
+    <delete id="delFunction" parameterType="hashMap">
+        delete from SYS_ROLE_FUNCTION where ROLE_ID = #{roleId} and FUNCTION_CODE IN
+                                                                    (SELECT CODE FROM REPORT_MODEL_T WHERE ID = #{modelId})
+    </delete>
+
+    <insert id="insertModel" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.sungcor.baobiao.report.bean.ReportModelBean"  >
+        insert into REPORT_MODEL_T (TYPE_ID,GROUP_ID,NAME,REPORT_NAME,STATUS,DESCRIPTION,CREATE_USER , CREATE_TIME ,
+                                    MODIFY_USER , MODIFY_TIME,SERVICE_CATEGORY_ID,PRODUCT_ID)
+        values (#{typeId},#{groupId},#{name},#{reportName},#{status},#{description}, #{createUser} , now() ,
+                #{modifyUser} , now(),#{serviceCategoryId},#{productId})
+    </insert>
+
+    <delete id="deleteModel" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_MODEL_T WHERE ID IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findReportModelList"  resultMap="reportModelMap">
+        SELECT * FROM REPORT_MODEL_T WHERE STATUS ='1'
+    </select>
+
+    <select id="findModelByIds" parameterType="java.util.ArrayList" resultMap="reportModelMap">
+        SELECT * FROM REPORT_MODEL_T WHERE ID IN
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+    </select>
+</mapper>

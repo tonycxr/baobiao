@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sungcor.baobiao.report.mapper.ReportTypeAttrMapper">
+    <resultMap id="reportTypeAttrMap"
+               type="com.sungcor.baobiao.report.bean.ReportTypeAttributeBean">
+        <result property="id" column="ID" />
+        <result property="typeId" column="TYPE_ID" />
+        <result property="status" column="STATUS" />
+        <result property="attributeId" column="ATTRIBUTE_ID" />
+        <result property="attributeName" column="ATTRIBUTE_NAME" />
+        <result property="dataSource" column="DATA_SOURCE" />
+        <result property="fieldName" column="FIELD_NAME"/>
+    </resultMap>
+
+    <resultMap id="reportStatDimMap"
+               type="com.sungcor.baobiao.report.bean.ReportStatDimensionBean">
+        <result property="id" column="ID" />
+        <result property="typeId" column="TYPE_ID" />
+        <result property="modelId" column="MODEL_ID" />
+        <result property="dimensionId" column="DIMENSION_ID" />
+        <result property="level" column="LEVEL" />
+        <result property="sort" column="SORT" />
+        <result property="extension" column="EXTENSION_MODE" />
+    </resultMap>
+
+    <select id="findAttrList" parameterType="map" resultMap="reportTypeAttrMap">
+        SELECT T.* FROM REPORT_TYPE_ATTRIBUTE_T T
+        <if test="typeId==5 and status=='dimension'">
+            LEFT JOIN REPORT_GROUPING_RELATION_T P ON P.PARENT_ID = #{parentId} WHERE T.ID = P.DIMENSION_ID
+        </if>
+        <if test="typeId!=5 or status=='index'">
+            WHERE T.TYPE_ID = #{typeId}
+        </if>
+        <if test="status!=null">
+            AND T.STATUS = #{status}
+        </if>
+        <if test="searchName!=null">
+            AND T.ATTRIBUTE_NAME like  CONCAT('%',#{searchName},'%' )
+        </if>
+    </select>
+
+    <select id="findDimByModelId" parameterType="hashMap" resultMap="reportStatDimMap">
+        SELECT * FROM REPORT_STATISTICAL_DIMENSION_T WHERE MODEL_ID = #{modelId} AND TYPE_ID =#{typeId}
+    </select>
+
+<!--    <select id="findSelDimByModelId" parameterType="hashMap" resultType="hashMap">-->
+<!--        SELECT SELECT_INDEX_ID,DATA_SOURCE FROM REPORT_DIMENSION_DETAILED_T WHERE MODEL_ID = #{modelId} AND TYPE_ID =#{typeId}-->
+<!--    </select>-->
+
+    <select id="querydimFromDict" parameterType="hashMap" resultType="hashMap">
+        SELECT CONCAT(#{source},'_',id) 'id',id 's_id',name,DICT_ID attrId,#{fieldName} fieldName,#{source} source FROM
+            SYS_DICT_ITEM WHERE DICT_ID = ${attrId}
+    </select>
+
+    <select id="querydimFromOrg" parameterType="hashMap" resultType="hashMap">
+        SELECT O.id,O.name,#{attrId} attrId,#{fieldName} fieldName,#{source} source,O.PARENT_ID parentId,
+               IF(T.ID IS NULL,0,1) isChecked
+        FROM SYS_ORGANIZATION O
+                 LEFT JOIN REPORT_TREE_DIMENSION_T T ON O.ID = T.SELECT_INDEX_ID AND T.MODEL_ID = #{modelId}
+        ORDER BY O.SORT
+    </select>
+
+    <select id="querydimFromServiceCat" parameterType="hashMap" resultType="hashMap">
+        SELECT CONCAT(#{source},'_',id) 'id',id 's_id',name,#{attrId} attrId,#{fieldName} fieldName,#{source} source FROM
+            SF_SERVICE_CATEGORY
+    </select>
+
+    <select id="querydimFromCustomer" parameterType="hashMap" resultType="hashMap">
+        SELECT CONCAT(#{source},'_',id) 'id',id 's_id',CUS_NAME name,#{attrId} attrId,#{fieldName} fieldName,#{source} source
+        FROM CUSTOMER_INFO
+    </select>
+
+    <select id="querydimFromArea" parameterType="hashMap" resultType="hashMap">
+        SELECT CONCAT(#{source},'_',id) 'id',id 's_id',name,#{attrId} attrId,#{fieldName} fieldName,#{source} source FROM
+            SYS_AREA
+    </select>
+
+    <select id="querydimFromRole" parameterType="hashMap" resultType="hashMap">
+        SELECT CONCAT(#{source},'_',id) 'id',id 's_id',name,#{attrId} attrId,#{fieldName} fieldName,#{source} source FROM
+            SYS_ROLE
+    </select>
+
+    <select id="querydimFromUser" parameterType="hashMap" resultType="hashMap">
+        SELECT CONCAT(#{source},'_',id) 'id',id 's_id',name,#{attrId} attrId,#{fieldName} fieldName,#{source} source FROM
+            SYS_USER
+    </select>
+
+    <select id="querydimFromCustomModel" parameterType="hashMap" resultType="hashMap">
+        SELECT CONCAT(#{source},'_',id) 'id',id 's_id',name,#{attrId} attrId,#{fieldName} fieldName,#{source} source FROM
+            ${attrId}
+    </select>
+
+    <select id="querydimFromBpm" parameterType="hashMap" resultType="hashMap">
+        SELECT CONCAT(#{source},'_',VALUE) 'id',VALUE 's_id',name,#{attrId} attrId,#{fieldName} fieldName,#{source} source
+        FROM REPORT_BPM_T
+        WHERE BPM_TYPE = #{attrId}
+    </select>
+
+    <select id="findSelDimIndex" parameterType="hashMap" resultType="hashMap">
+        SELECT CONCAT(DATA_SOURCE,'_',SELECT_INDEX_ID) 'id',SELECT_INDEX_ID 's_id',SELECT_INDEX_NAME name,DATA_SOURCE
+        source,FIELD_NAME fieldName FROM
+        REPORT_DIMENSION_DETAILED_T
+        WHERE MODEL_ID = #{modelId}
+        <if test="source!=null">
+            AND DATA_SOURCE = #{source}
+        </if>
+        <if test="fieldName!=null">
+            AND FIELD_NAME = #{fieldName}
+        </if>
+        <if test="sort!=null">
+            AND LEVEL = #{sort}
+        </if>
+        ORDER BY SORT
+    </select>
+
+    <select id="findSelIndex" parameterType="hashMap" resultType="hashMap">
+        SELECT CONCAT(DATA_SOURCE,'_',SELECT_INDEX_ID) 'id',SELECT_INDEX_ID 's_id',INDEX_ID indexId,INDEX_NAME name,
+        FIELD_NAME fieldName,DATA_SOURCE source,
+        SELECT_INDEX_NAME selIndexName FROM REPORT_STATISTICAL_INDEX_T
+        WHERE 1=1
+        <if test="modelId!=null"> AND MODEL_ID = #{modelId} </if>
+        <if test="attrId!=null"> AND INDEX_ID = #{attrId} </if>
+        <if test="ID!=null"> AND SELECT_INDEX_ID = #{ID} </if>
+        ORDER BY SORT
+    </select>
+
+    <insert id="addDimension" parameterType="java.util.ArrayList">
+        INSERT INTO REPORT_DIMENSION_DETAILED_T (ID,MODEL_ID,TYPE_ID,SELECT_INDEX_ID,SELECT_INDEX_NAME,DATA_SOURCE,
+        FIELD_NAME,LEVEL,SORT) VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.id},#{item.modelId},#{item.typeId},#{item.sindexId},#{item.selIndexName},
+            #{item.dataSource},#{item.fieldName},#{item.level},#{item.sort})
+        </foreach>
+    </insert>
+
+    <insert id="addIndex" parameterType="java.util.ArrayList">
+        INSERT INTO REPORT_STATISTICAL_INDEX_T (ID,MODEL_ID,TYPE_ID,INDEX_ID,SELECT_INDEX_ID,SELECT_INDEX_NAME,
+        INDEX_NAME,FIELD_NAME,DATA_SOURCE,SORT) VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.id},#{item.modelId},#{item.typeId},#{item.indexId},#{item.selIndexId},#{item.selIndexName}
+            ,#{item.indexName},#{item.fieldName},#{item.dataSource},#{item.sort})
+        </foreach>
+    </insert>
+
+    <insert id="addStatDim" parameterType="java.util.ArrayList">
+        INSERT INTO REPORT_STATISTICAL_DIMENSION_T (ID,MODEL_ID,TYPE_ID,DIMENSION_ID,SORT,EXTENSION_MODE) VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.id},#{item.modelId},#{item.typeId},#{item.dimensionId},#{item.sort},#{item.extension})
+        </foreach>
+    </insert>
+
+    <delete id="deteteStatDimByModelIds" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_STATISTICAL_DIMENSION_T WHERE  MODEL_ID IN
+        <foreach collection="array" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+    </delete>
+    <delete id="deteteIndexByModelIds" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_STATISTICAL_INDEX_T WHERE  MODEL_ID IN
+        <foreach collection="array" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+    </delete>
+    <delete id="deteteDimByModelIds" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_DIMENSION_DETAILED_T WHERE  MODEL_ID IN
+        <foreach collection="array" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findModel" parameterType="hashMap" resultType="com.sungcor.baobiao.report.bean.ReportModelBean">
+        SELECT M.ID 'id',M.NAME 'name' FROM REPORT_MODEL_T M WHERE M.GROUP_ID = #{id}
+                                                               AND M.TYPE_ID!=6 AND M.TYPE_ID!=8 AND M.STATUS = 1
+        AND M.ID NOT IN (SELECT T.MODEL_ID FROM REPORT_CHAPTER_CHILD_T T,REPORT_MODEL_CHAPTER_T P
+        WHERE T.CHAPERT_ID = P.ID AND  P.MODEL_ID = #{modelId})
+    </select>
+
+    <select id="findModelChapter" parameterType="int" resultType="com.sungcor.baobiao.report.bean.ReportChapterBean">
+        SELECT P.ID 'id',P.CHAPERT_NAME 'chapterName',P.CHAPERT_DESC 'chapterDesc',COUNT(*) 'num'
+        FROM REPORT_MODEL_CHAPTER_T P,REPORT_CHAPTER_CHILD_T T
+        WHERE  P.ID = T.CHAPERT_ID
+          AND P.MODEL_ID = #{id}
+        GROUP BY P.ID,P.CHAPERT_NAME,P.CHAPERT_DESC
+    </select>
+
+    <select id="findChapterCByModelIds" parameterType="java.util.Arrays" resultType="com.sungcor.baobiao.report.bean.ReportChapterBean">
+        SELECT CHAPERT_ID id,MODEL_ID modelId,sort
+        FROM REPORT_CHAPTER_CHILD_T WHERE MODEL_ID IN
+        <foreach collection="array" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findChapterChild" parameterType="int" resultType="com.sungcor.baobiao.report.bean.ReportChapterBean">
+        SELECT M.ID 'id', M.NAME 'chapterName', G.NAME 'type',T.MODEL_ID modelId,T.SORT sort
+        FROM REPORT_MODEL_T M,REPORT_MODEL_CHAPTER_T P,REPORT_CHAPTER_CHILD_T T,REPORT_GROUP_T G
+        WHERE M.ID = T.MODEL_ID AND P.ID = T.CHAPERT_ID AND M.GROUP_ID = G.ID
+          AND P.ID = #{ID}
+    </select>
+
+    <select id="findGroupingReport" parameterType="String" resultType="hashMap">
+        SELECT T2.ID,T2.CHAPERT_NAME,T2.CHAPERT_DESC,T1.MODEL_ID,T3.TYPE_ID FROM REPORT_CHAPTER_CHILD_T T1
+                                                                                     LEFT JOIN REPORT_MODEL_CHAPTER_T T2 ON T1.CHAPERT_ID = T2.ID
+                                                                                     LEFT JOIN REPORT_MODEL_T T3 ON T1.MODEL_ID = T3.ID
+        WHERE T2.MODEL_ID = #{modelId} ORDER BY T2.SORT,T1.SORT
+    </select>
+
+    <update id="updateChapter" parameterType="com.sungcor.baobiao.report.bean.ReportChapterBean" >
+        UPDATE REPORT_MODEL_CHAPTER_T SET CHAPERT_NAME = #{chapterName},CHAPERT_DESC = #{chapterDesc} WHERE ID = #{id}
+    </update>
+
+    <insert id="addChapter" parameterType="com.sungcor.baobiao.report.bean.ReportChapterBean" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO REPORT_MODEL_CHAPTER_T (MODEL_ID,CHAPERT_NAME,CHAPERT_DESC,SORT) VALUES (#{modelId},#{chapterName},
+                                                                                             #{chapterDesc},#{sort})
+    </insert>
+
+    <insert id="addChapterChild" parameterType="java.util.ArrayList" >
+        INSERT INTO REPORT_CHAPTER_CHILD_T (CHAPERT_ID,MODEL_ID,SORT) VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.id},#{item.modelId},#{item.sort})
+        </foreach>
+    </insert>
+
+    <update id="updateModelChapter" parameterType="java.util.ArrayList">
+        UPDATE REPORT_MODEL_CHAPTER_T SET SORT = CASE ID
+        <foreach collection="list" item="i" index="index">
+            when #{i.id} then #{i.sort}
+        </foreach> END
+        where id in
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="," >
+            #{item.id}
+        </foreach>
+    </update>
+
+    <delete id="deleteChapterChild" parameterType="int">
+        DELETE FROM REPORT_CHAPTER_CHILD_T WHERE CHAPERT_ID = #{id}
+    </delete>
+
+    <delete id="deleteModelChapter" parameterType="int">
+        DELETE FROM REPORT_MODEL_CHAPTER_T WHERE id = #{id}
+    </delete>
+
+    <insert id="addTreeDimension" parameterType="java.util.ArrayList">
+        INSERT INTO REPORT_TREE_DIMENSION_T (ID,MODEL_ID,SELECT_INDEX_ID,SELECT_INDEX_NAME,PARENT_INDEX_ID,DATA_SOURCE,
+        FIELD_NAME,SORT,LEVEL) VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.id},#{item.modelId},#{item.sindexId},#{item.selIndexName},#{item.parentIndexId},
+            #{item.dataSource},#{item.fieldName},#{item.sort},#{item.level})
+        </foreach>
+    </insert>
+    <delete id="deleteTreeDimensionByModelIds" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_TREE_DIMENSION_T WHERE MODEL_ID IN
+        <foreach collection="array" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findSelTreeDim" parameterType="hashMap" resultType="hashMap">
+        select ${sql1}id,
+        t.SELECT_INDEX_NAME name,
+        ${sql2}
+        t.DATA_SOURCE source,t.FIELD_NAME fieldName
+        from
+        (select * from REPORT_TREE_DIMENSION_T where model_id = #{modelId} and PARENT_INDEX_ID = #{value}
+        <if test="source!=null">
+            AND DATA_SOURCE = #{source}
+        </if>
+        <if test="fieldName!=null">
+            AND FIELD_NAME = #{fieldName}
+        </if>
+        ) t
+        ${sql3}
+    </select>
+
+    <select id="findSelTreeDim_1" parameterType="hashMap" resultType="hashMap">
+        select SELECT_INDEX_ID id,SELECT_INDEX_NAME name,SELECT_INDEX_NAME name1,DATA_SOURCE source,FIELD_NAME fieldName
+        from REPORT_TREE_DIMENSION_T p where model_id = #{modelId} and SELECT_INDEX_ID = #{value}
+        <if test="source!=null">
+            AND DATA_SOURCE = #{source}
+        </if>
+        <if test="fieldName!=null">
+            AND FIELD_NAME = #{fieldName}
+        </if>
+    </select>
+
+    <insert id="copyDim" parameterType="hashMap">
+        INSERT INTO REPORT_DIMENSION_DETAILED_T (MODEL_ID,TYPE_ID,SELECT_INDEX_ID,SELECT_INDEX_NAME,DATA_SOURCE,FIELD_NAME,LEVEL,SORT)
+        SELECT #{n_modelId},TYPE_ID,SELECT_INDEX_ID,SELECT_INDEX_NAME,DATA_SOURCE,FIELD_NAME,LEVEL,SORT
+        FROM REPORT_DIMENSION_DETAILED_T WHERE MODEL_ID = #{o_modelId} AND TYPE_ID = #{typeId}
+    </insert>
+    <insert id="copyIndex" parameterType="hashMap">
+        INSERT INTO REPORT_STATISTICAL_INDEX_T (MODEL_ID,TYPE_ID,INDEX_ID,SELECT_INDEX_ID,SELECT_INDEX_NAME,INDEX_NAME,FIELD_NAME,DATA_SOURCE,SORT)
+        SELECT #{n_modelId},TYPE_ID,INDEX_ID,SELECT_INDEX_ID,SELECT_INDEX_NAME,INDEX_NAME,FIELD_NAME,DATA_SOURCE,SORT
+        FROM REPORT_STATISTICAL_INDEX_T WHERE MODEL_ID = #{o_modelId} AND TYPE_ID = #{typeId}
+    </insert>
+    <insert id="copyStatDim" parameterType="hashMap">
+        INSERT INTO REPORT_STATISTICAL_DIMENSION_T (MODEL_ID,TYPE_ID,DIMENSION_ID,SORT,EXTENSION_MODE )
+        SELECT #{n_modelId},TYPE_ID,DIMENSION_ID,SORT,EXTENSION_MODE
+        FROM REPORT_STATISTICAL_DIMENSION_T WHERE MODEL_ID = #{o_modelId} AND TYPE_ID = #{typeId}
+    </insert>
+
+    <insert id="copyTreeDim" parameterType="hashMap">
+        INSERT INTO REPORT_TREE_DIMENSION_T (MODEL_ID,SELECT_INDEX_ID,SELECT_INDEX_NAME,PARENT_INDEX_ID,DATA_SOURCE,FIELD_NAME,SORT,LEVEL)
+        SELECT #{n_modelId},SELECT_INDEX_ID,SELECT_INDEX_NAME,PARENT_INDEX_ID,DATA_SOURCE,FIELD_NAME,SORT,LEVEL
+        FROM REPORT_TREE_DIMENSION_T WHERE MODEL_ID = #{o_modelId}
+    </insert>
+
+    <delete id="deleteCpChildByModelIds" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_CHAPTER_CHILD_T WHERE CHAPERT_ID IN (
+        SELECT ID FROM REPORT_MODEL_CHAPTER_T WHERE MODEL_ID IN
+        <foreach collection="array" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+        )
+    </delete>
+
+    <delete id="deleteChapterByModelIds" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_MODEL_CHAPTER_T WHERE MODEL_ID IN
+        <foreach collection="array" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+    </delete>
+
+    <insert id="addTrendDim" parameterType="hashMap">
+        INSERT INTO REPORT_TREND_DIMENSION_T (ID,MODEL_ID,TREND_TYPE) VALUES
+            (#{id},#{modelId},#{trendType})
+    </insert>
+
+    <select id="findSelTrendDim" parameterType="hashMap" resultType="hashMap">
+        SELECT MODEL_ID 'modelId',TREND_TYPE 'trendType' FROM REPORT_TREND_DIMENSION_T WHERE MODEL_ID = #{modelId}
+    </select>
+    <select id="querydimFromRunLog" resultType="java.util.Map">
+
+    </select>
+
+    <delete id="deteteTrendDimByModelIds" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_TREND_DIMENSION_T WHERE MODEL_ID IN
+        <foreach collection="array" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+    </delete>
+    <insert id="copyTrendDim" parameterType="hashMap">
+        INSERT INTO REPORT_TREND_DIMENSION_T (MODEL_ID,TREND_TYPE)
+        SELECT #{n_modelId},TREND_TYPE
+        FROM REPORT_TREND_DIMENSION_T WHERE MODEL_ID = #{o_modelId}
+    </insert>
+</mapper>

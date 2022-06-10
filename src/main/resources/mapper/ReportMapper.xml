@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.report.mapper.ReportMapper">
+
+
+
+    <select id="findSelectOrderNum" parameterType="hashMap" resultType="hashMap">
+        select ${dSelect} dimensionId,${sSelect} statIndexId,
+               ${countSql}
+                          orderNum from ${tableName} T1
+            ${dSql}
+            ${sSql}
+            ${whereSql}
+            ${regionInner}
+        GROUP BY dimensionId,statIndexId
+    </select>
+
+    <select id="findTableNameByModelId" parameterType="String" resultType="hashMap">
+        SELECT T1.MAIN_TABLE_NAME,T1.CHILD_TABLE_NAME,T1.TIME_FILED,T1.NAME_FIELD,T1.VALUE_FILED,T1.RELATION_FILED FROM REPORT_TYPE_T T1 ,REPORT_MODEL_T T2
+        WHERE T1.ID = T2.TYPE_ID AND T2.ID= #{modelId}
+    </select>
+
+    <select id="findTableNameByMap" parameterType="hashMap" resultType="String">
+        SELECT DISTINCT ATTRIBUTE_ID FROM REPORT_TYPE_ATTRIBUTE_T WHERE DATA_SOURCE = #{dSource} AND FIELD_NAME = #{fieldName}
+    </select>
+
+</mapper>

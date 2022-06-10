@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.DictItemMapper">
+
+    <resultMap id="dictItemBeanMap" type="com.sungcor.baobiao.entity.DictItem">
+        <result property="id" column="ID" />
+        <result property="code" column="CODE" />
+        <result property="name" column="NAME" />
+        <result property="dictId" column="DICT_ID"/>
+        <result property="description" column="DESCRIPTION" />
+        <result property="level" column="LEVEL"/>
+        <result property="sysFlag" column="SYSFLAG" />
+        <result property="createUser" column="CREATE_USER" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="modifyUser" column="MODIFY_USER" />
+        <result property="modifyTime" column="MODIFY_TIME" />
+    </resultMap>
+
+    <insert id="insertDictItem" parameterType="com.sungcor.baobiao.entity.DictItem" >
+        insert into SYS_DICT_ITEM (CODE, NAME,DICT_ID,DESCRIPTION,LEVEL,SYSFLAG,CREATE_USER , CREATE_TIME , MODIFY_USER , MODIFY_TIME)
+        values (#{code}, #{name},#{dictId},#{description},#{level},#{sysFlag},#{createUser} , #{createTime} , #{modifyUser} , #{modifyTime})
+    </insert>
+
+    <select id="getDictItemById" parameterType="Integer" resultMap="dictItemBeanMap">
+        SELECT SD.ID,SD.CODE,SD.NAME,SD.DESCRIPTION,SD.LEVEL,SD.SYSFLAG,SD.CREATE_USER,SD.CREATE_TIME
+             ,SD.MODIFY_USER,SD.MODIFY_TIME FROM SYS_DICT_ITEM  SD
+        WHERE SD.ID = #{id}
+    </select>
+
+    <delete id="deleteDictItemById" parameterType="Integer">
+        DELETE FROM SYS_DICT_ITEM WHERE ID = #{id}
+    </delete>
+
+    <delete id="deleteDictItemByDictId" parameterType="Integer">
+        DELETE FROM SYS_DICT_ITEM WHERE DICT_ID = #{id}
+    </delete>
+
+    <update id="updateDictItem" parameterType="com.sungcor.baobiao.entity.DictItem">
+        UPDATE SYS_DICT_ITEM
+        <set>
+            <if test="code != null">CODE=#{code},</if>
+            <if test="name != null">NAME=#{name},</if>
+            <if test="description != null">DESCRIPTION=#{description},</if>
+            <if test="level != null">LEVEL=#{level},</if>
+            <if test="modifyUser != null">MODIFY_USER=#{modifyUser},</if>
+            <if test="modifyTime != null">MODIFY_TIME =#{modifyTime}</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <select id="getDictItemsCount" parameterType="Integer"  resultType="hashMap">
+        SELECT COUNT(*) AS dictItemCount FROM SYS_DICT_ITEM SDI WHERE SDI.DICT_ID = #{dictId}
+    </select>
+
+    <select id="getDictItemsPaging"  resultMap="dictItemBeanMap">
+        SELECT * FROM SYS_DICT_ITEM  WHERE DICT_ID = #{id}  LIMIT #{beginRow},#{pageRowCnt}
+    </select>
+
+    <select id="getDictItems"  resultMap="dictItemBeanMap">
+        SELECT * FROM SYS_DICT_ITEM  WHERE DICT_ID = #{id} ORDER BY ID
+    </select>
+
+    <select id="getDictItemByCode" parameterType="String" resultMap="dictItemBeanMap">
+        SELECT SD.ID,SD.CODE,SD.NAME,SD.DESCRIPTION,SD.LEVEL,SD.SYSFLAG,SD.CREATE_USER,SD.CREATE_TIME
+             ,SD.MODIFY_USER,SD.MODIFY_TIME FROM SYS_DICT_ITEM  SD
+        WHERE SD.CODE = #{code}
+    </select>
+
+    <select id="getDictItemByName" resultMap="dictItemBeanMap">
+        SELECT SD.* FROM SYS_DICT_ITEM  SD
+        WHERE SD.NAME = #{name} AND  SD.DICT_ID = #{id}
+    </select>
+
+    <select id="getDictItemByDictCode" parameterType="String" resultMap="dictItemBeanMap">
+        SELECT sdi.ID,sdi.CODE,sdi.NAME,sdi.DICT_ID,sdi.DESCRIPTION FROM SYS_DICT_ITEM sdi
+                                                                             INNER JOIN SYS_DICT sd ON sd.ID=sdi.DICT_ID
+        WHERE sd.CODE=#{code}
+    </select>
+</mapper>

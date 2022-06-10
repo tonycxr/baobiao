@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.AccessControlMapper">
+
+    <resultMap id="accessControl" type="com.sungcor.baobiao.entity.FormAccessControl">
+        <result property="id" column="ID" />
+        <result property="businessDef1" column="BUSINESSDEF1" />
+        <result property="businessDef2" column="BUSINESSDEF2" />
+        <result property="businessDef3" column="BUSINESSDEF3" />
+        <result property="businessDef4" column="BUSINESSDEF4" />
+        <result property="businessDef5" column="BUSINESSDEF5" />
+        <result property="businessDef6" column="BUSINESSDEF6" />
+        <result property="businessDef7" column="BUSINESSDEF7" />
+        <result property="businessDef8" column="BUSINESSDEF8" />
+        <result property="businessDef9" column="BUSINESSDEF9" />
+        <result property="businessDef10" column="BUSINESSDEF10" />
+        <result property="formID" column="FORMID" />
+        <result property="elementID" column="ELEMENTID" />
+        <result property="visibleFlag" column="VISIBLEFLAG" />
+        <result property="writeFlag" column="WRITEFLAG" />
+        <result property="addFlag" column="ADDFLAG" />
+        <result property="modifyFlag" column="MODIFYFLAG" />
+        <result property="deleteFlag" column="DELETEFLAG" />
+        <result property="subFormID" column="SUBFORMID" />
+        <result property="printFlag" column="PRINTFLAG" />
+    </resultMap>
+
+
+    <resultMap id="subFormFieldBean" type="com.sungcor.baobiao.entity.FieldForm">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="label" column="LABEL"/>
+        <result property="renderType" column="RENDER_TYPE"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.sungcor.baobiao.entity.FormAccessControl" >
+        INSERT INTO FM_FORM_ACCESS_CONTROL (BUSINESSDEF1, BUSINESSDEF2, BUSINESSDEF3 , BUSINESSDEF4 , BUSINESSDEF5 ,
+                                            BUSINESSDEF6 , BUSINESSDEF7,BUSINESSDEF8,BUSINESSDEF9,BUSINESSDEF10,FORMID,ELEMENTID,VISIBLEFLAG,
+                                            WRITEFLAG,ADDFLAG,MODIFYFLAG,DELETEFLAG,SUBFORMID,PRINTFLAG)
+        VALUES (#{businessDef1}, #{businessDef2}, #{businessDef3} , #{businessDef4} , #{businessDef5} , #{businessDef6} ,
+                #{businessDef7},#{businessDef8},#{businessDef9},#{businessDef10},#{formID},#{elementID},#{visibleFlag},
+                #{writeFlag},#{addFlag},#{modifyFlag},#{deleteFlag},#{subFormID},#{printFlag})
+    </insert>
+
+    <delete id="delete" parameterType="String">
+        DELETE FROM FM_FORM_ACCESS_CONTROL WHERE 1=1 #{bussis}
+    </delete>
+
+    <select id="getListByCondition" parameterType="Map" resultMap="accessControl">
+        SELECT DISTINCT ffac.* FROM FM_FORM_ACCESS_CONTROL ffac
+        <if test="areaID != null">
+            INNER JOIN FM_FIELD ff ON ff.ID=ffac.ELEMENTID
+            INNER JOIN FM_AREA fa ON fa.ID=ff.AREA_ID
+        </if>
+        WHERE 1=1
+        <if test="businessDef1 != null"> AND ffac.BUSINESSDEF1=#{businessDef1}</if>
+        <if test="businessDef2 != null"> AND ffac.BUSINESSDEF2=#{businessDef2}</if>
+        <if test="businessDef3 != null"> AND ffac.BUSINESSDEF3=#{businessDef3}</if>
+        <if test="businessDef4 != null"> AND ffac.BUSINESSDEF4=#{businessDef4}</if>
+        <if test="businessDef5 != null"> AND ffac.BUSINESSDEF5=#{businessDef5}</if>
+        <if test="businessDef6 != null"> AND ffac.BUSINESSDEF6=#{businessDef6}</if>
+        <if test="businessDef7 != null"> AND ffac.BUSINESSDEF7=#{businessDef7}</if>
+        <if test="businessDef8 != null"> AND ffac.BUSINESSDEF8=#{businessDef8}</if>
+        <if test="businessDef9 != null"> AND ffac.BUSINESSDEF9=#{businessDef9}</if>
+        <if test="businessDef10 != null"> AND ffac.BUSINESSDEF10=#{businessDef10}</if>
+        <if test="formID != null"> AND ffac.FORMID=#{formID}</if>
+        <if test="fieldID != null"> AND ffac.ELEMENTID=#{fieldID}</if>
+        <if test="subFormID != null"> AND ffac.SUBFORMID=#{subFormID}</if>
+        <if test="areaID != null"> AND fa.ID=#{areaID}</if>
+    </select>
+
+    <select id="getSubFormField" parameterType="String" resultMap="subFormFieldBean">
+        SELECT ff.* FROM FM_FIELD ff
+                             INNER JOIN FM_AREA fa ON fa.ID=ff.AREA_ID
+                             INNER JOIN FM_FORM_VERSION ffv ON ffv.ID=fa.FORM_VERSION_ID
+        WHERE ffv.ID=#{subFormId}
+    </select>
+
+</mapper>

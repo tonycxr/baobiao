@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.SungcorProductMapper">
+
+    <resultMap id="sungcorProductBeanMap" type="com.sungcor.baobiao.entity.SungcorProduct">
+        <result property="productName" column="productName" />
+        <result property="firstSeason" column="firstSeason" />
+        <result property="secondSeason" column="secondSeason" />
+        <result property="thirdSeason" column="thirdSeason" />
+        <result property="fourthSeason" column="fourthSeason"   />
+    </resultMap>
+    <select id="getSungcorProduct" parameterType="String" resultType="com.sungcor.baobiao.entity.SungcorProduct">
+        SELECT *  FROM sungcorproduct  WHERE  productName=#{productName}
+    </select>
+
+
+</mapper>

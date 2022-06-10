@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.ProcessMapper">
+
+    <resultMap id="processBeanMap" type="com.sungcor.baobiao.entity.Process">
+        <result property="id" column="ID" />
+        <result property="code" column="CODE" />
+        <result property="name" column="NAME" />
+        <result property="pin" column="PIN" />
+        <result property="creatorId" column="CREATOR_ID"   />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="updatorId" column="UPDATOR_ID" />
+        <result property="updateTime" column="UPDATE_TIME" />
+        <result property="deleteFlag" column="DELETE_FLAG" />
+        <result property="processDefinitionID" column="PROCESS_DEFINITION_ID" />
+        <result property="currentVersion" column="CURRENT_VERSION" />
+        <result property="lastVersion" column="LAST_VERSION" />
+        <result property="organizationId" column="ORGANIZATION_ID" />
+        <result property="formID" column="FORM_ID" />
+        <result property="description" column="DESCRIPTION" />
+        <result property="processTemplateId" column="PROCESS_TEMPLATE_ID" />
+    </resultMap>
+    <resultMap id="myworkMap" type="com.sungcor.baobiao.entity.MyworkBean">
+        <result property="caseNo" column="CASE_NO" />
+        <result property="subject" column="SUBJECT" />
+        <result property="states" column="STATUS" />
+        <result property="serviceCategoryID" column="SERVICE_CATEGORY_ID" />
+        <result property="serviceCategoryName" column="SERVICE_CATEGORY_NAME" />
+        <result property="product" column="PRODUCT" />
+        <result property="creator" column="CREATOR" />
+        <result property="createTimeDate" column="CREATE_TIME" />
+        <result property="priority" column="PRIORITY" />
+<!--        <result property="incidentType" column="INCIDENT_TYPE" />-->
+        <result property="processInstanceId" column="PROCESS_INSTANCE_ID" />
+        <result property="type" column="TYPE" />
+        <result property="product" column="PRODUCT" />
+        <result property="tableName" column="TABLE_NAME" />
+        <result property="previousPerson" column="PREVIOUS_PERSON" />
+        <result property="previousTimeDate" column="PREVIOUS_TIME" />
+        <result property="counts" column="COUNTS" />
+        <result property="urgency" column="URGENCY" />
+        <result property="bpmSigning" column="BPM_SIGNING" />
+        <result property="currentNode" column="CURRENT_NODE" />
+
+    </resultMap>
+
+    <select id="get" parameterType="int" resultMap="processBeanMap">
+        SELECT  *
+        FROM BPM_PROCESS
+        WHERE ID=#{id}
+    </select>
+
+    <select id="getByName" parameterType="String" resultMap="processBeanMap">
+        SELECT  *
+        FROM BPM_PROCESS
+        WHERE NAME=#{name}
+    </select>
+
+
+
+    <insert id="save" parameterType="com.sungcor.baobiao.entity.Process" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BPM_PROCESS (CODE, NAME, PIN ,  CREATOR_ID , CREATE_TIME , UPDATOR_ID,UPDATE_TIME ,
+        DELETE_FLAG ,  PROCESS_DEFINITION_ID , CURRENT_VERSION ,  LAST_VERSION  , ORGANIZATION_ID , FORM_ID ,DESCRIPTION,PROCESS_TEMPLATE_ID )
+        VALUES (#{code}, #{name}, #{pin} , #{creatorId} , #{createTime} , #{updatorId} , #{updateTime} ,
+        #{deleteFlag} ,  #{processDefinitionID} ,  #{currentVersion} , #{lastVersion} , #{organizationId} , #{formID} , #{description},#{processTemplateId} )
+    </insert>
+
+    <update id="update" parameterType="com.sungcor.baobiao.entity.Process">
+        UPDATE BPM_PROCESS
+        <set>
+            <if test="updatorId != null">UPDATOR_ID=#{updatorId},</if>
+            <if test="updateTime != null">UPDATE_TIME=#{updateTime},</if>
+            <if test="deleteFlag != null">DELETE_FLAG=#{deleteFlag},</if>
+            <if test="currentVersion != null">CURRENT_VERSION=#{currentVersion},</if>
+            <if test="lastVersion != null">LAST_VERSION=#{lastVersion},</if>
+            <if test="processDefinitionID != null">PROCESS_DEFINITION_ID=#{processDefinitionID},</if>
+            <if test="name != null">NAME=#{name},</if>
+            <if test="description != null">DESCRIPTION=#{description},</if>
+
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <select id="listProcessByOrgs" parameterType="Map" resultMap="processBeanMap">
+        SELECT  bp.*
+        FROM BPM_PROCESS bp
+        WHERE 1=1
+        <if test="serviceType != null">
+            AND EXISTS (SELECT 1 FROM  FM_FORM ff WHERE bp.FORM_ID = ff.ID AND ff.SERVICE_CATEGORY_ID=#{serviceType} )
+        </if>
+        <if test="processName != null ">
+            AND bp.NAME LIKE CONCAT('%',#{processName},'%')
+        </if>
+
+        <if test="list != null ">
+            AND bp.ORGANIZATION_ID IN
+            <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="beginRow != null and pageRowCnt != null">
+            LIMIT #{beginRow},#{pageRowCnt}
+        </if>
+    </select>
+
+
+    <select id="getProcessCountByOrgs"  parameterType="Map"  resultType="int">
+        SELECT  COUNT(*)
+        FROM BPM_PROCESS bp
+        WHERE 1=1
+        <if test="serviceType != null">
+            AND EXISTS (SELECT 1 FROM  FM_FORM ff WHERE bp.FORM_ID = ff.ID AND ff.SERVICE_CATEGORY_ID=#{serviceType} )
+        </if>
+        <if test="processName != null ">
+            AND bp.NAME LIKE CONCAT('%',#{processName},'%')
+        </if>
+
+        <if test="list != null ">
+            AND bp.ORGANIZATION_ID IN
+            <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+
+    <select id="listAvailableProcessByOrgs" parameterType="Map" resultMap="processBeanMap">
+        SELECT  bp.*
+        FROM BPM_PROCESS bp
+        WHERE DELETE_FLAG != '1'
+
+        <if test="list != null ">
+            AND bp.ORGANIZATION_ID IN
+            <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="beginRow != null and pageRowCnt != null">
+            LIMIT #{beginRow},#{pageRowCnt}
+        </if>
+    </select>
+
+    <select id="listAvailableProcessByOrgsAndCategoryId" parameterType="Map" resultMap="processBeanMap">
+        SELECT bp.*
+        FROM BPM_PROCESS bp JOIN FM_FORM ff
+        ON bp.FORM_ID = ff.ID
+        WHERE bp.DELETE_FLAG != '1' AND ff.SERVICE_CATEGORY_ID = #{type}   AND bp.CURRENT_VERSION != 0
+        <if test="list != null ">
+            AND bp.ORGANIZATION_ID IN
+            <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="checkProductRelDelete" parameterType="Integer" resultType="Integer">
+        SELECT COUNT(*) FROM SF_SERVICE_PRODUCT WHERE FLOW_ID=#{id}
+    </select>
+
+    <select id="checkProcessInsDelete" parameterType="Integer" resultType="Integer">
+        SELECT COUNT(*) FROM BPM_PROCESS_VERSION  bpv WHERE
+        bpv.PROCESS_ID = #{id} AND EXISTS (SELECT * FROM BPM_PROCESS_INSTANCE bpi WHERE bpi.PROCESS_DEFINITION_ID = bpv.ID )
+    </select>
+
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM BPM_PROCESS WHERE ID = #{id};
+    </delete>
+
+    <select id="queryFormTable" parameterType="Map" resultMap="myworkMap">
+        <!--SELECT bpi.ID AS PROCESS_INSTANCE_ID,ff.INSTANCE_TABLE AS  TABLE_NAME,ff.SERVICE_CATEGORY_ID,ssc.NAME AS SERVICE_CATEGORY_NAME
+        FROM bpm_process_instance bpi
+        INNER JOIN fm_form_version ffv ON ffv.ID = bpi.form_version_id
+        INNER JOIN fm_form ff ON ff.ID = ffv.form_id
+        INNER JOIN SF_SERVICE_CATEGORY ssc ON ssc.ID=ff.SERVICE_CATEGORY_ID
+        INNER JOIN
+        (
+        SELECT ssp.processinstance_id  prid
+        FROM  SF_SP_PROCESSINSTANCE ssp
+        INNER JOIN sf_service_product sp ON sp.ID = ssp.serviceproduct_id
+        INNER JOIN bpm_process bp ON bp.ID = sp.flow_Id
+        INNER JOIN fm_form ff ON ff.ID = bp.form_id
+        WHERE  1=1
+        <if test="serviceCategoryId != null">AND  ff.SERVICE_CATEGORY_ID ='${serviceCategoryId}'</if>
+        AND EXISTS(
+        SELECT * FROM  bpm_process_instance bpit WHERE bpit.ID = ssp.processinstance_id  AND bpit.PARENT_PROCESS_INSTANCE_ID IS NULL
+        )
+        UNION
+        SELECT ssp.processinstance_id  prid
+        FROM SF_SP_PROCESSINSTANCE ssp
+        INNER JOIN sf_service_product sp ON sp.ID = ssp.serviceproduct_id
+        INNER JOIN bpm_process bp ON bp.ID = sp.flow_Id
+        INNER JOIN fm_form ff ON ff.ID = bp.form_id
+        WHERE 1=1
+        <if test="serviceCategoryId != null">AND  ff.SERVICE_CATEGORY_ID ='${serviceCategoryId}'</if>
+        AND EXISTS(
+        SELECT * FROM  bpm_process_instance bpit WHERE bpit.ID = ssp.processinstance_id  AND bpit.PARENT_PROCESS_INSTANCE_ID IS NOT NULL
+        )
+        AND EXISTS (
+        SELECT * FROM    bpm_process_instance  bpit1 join bpm_process bp1 ON bpit1.process_id = bp1.ID
+        INNER JOIN fm_form ff1 ON (ff1.ID = bp1.form_id
+        <if test="serviceCategoryId != null">AND  ff1.SERVICE_CATEGORY_ID ='${serviceCategoryId}'</if>
+        )
+        WHERE  ssp.processinstance_id  = bpit1.ID
+        )
+        ) temp
+        ON bpi.ID = temp.prid
+        ORDER BY ff.SERVICE_CATEGORY_ID DESC-->
+        SELECT bpi.ID AS PROCESS_INSTANCE_ID,ff.INSTANCE_TABLE AS  TABLE_NAME,ff.SERVICE_CATEGORY_ID,ssc.NAME AS SERVICE_CATEGORY_NAME
+        FROM BPM_PROCESS_INSTANCE bpi
+        INNER JOIN FM_FORM_VERSION ffv ON ffv.ID = bpi.FORM_VERSION_ID
+        INNER JOIN FM_FORM ff ON ff.ID = ffv.FORM_ID
+        INNER JOIN SF_SERVICE_CATEGORY ssc ON ssc.ID=ff.SERVICE_CATEGORY_ID
+        INNER JOIN
+        (
+        SELECT ssp.PROCESSINSTANCE_ID  prid
+        FROM  SF_SP_PROCESSINSTANCE ssp
+        INNER JOIN SF_SERVICE_PRODUCT sp ON sp.ID = ssp.SERVICEPRODUCT_ID
+        INNER JOIN BPM_PROCESS bp ON bp.ID = sp.FLOW_ID
+        INNER JOIN FM_FORM ff ON ff.ID = bp.FORM_ID
+        WHERE  1=1
+        <if test="serviceCategoryId != null">AND  ff.SERVICE_CATEGORY_ID ='${serviceCategoryId}'</if>
+        AND EXISTS(
+        SELECT * FROM  BPM_PROCESS_INSTANCE bpit WHERE bpit.ID = ssp.PROCESSINSTANCE_ID  AND bpit.PARENT_PROCESS_INSTANCE_ID IS NULL
+        )
+        AND(
+        EXISTS (
+        SELECT 1 FROM SYS_USER u
+        WHERE EXISTS (SELECT 1 FROM BPM_NODE_HISTORY bnh WHERE bnh.PROCESS_INSTANCE_ID = ssp.PROCESSINSTANCE_ID AND u.ID = bnh.IMPLEMENTER_ID)
+        AND u.ORGANIZATION_ID IN
+        <foreach item="item" index="index" collection="list"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        )
+        OR EXISTS (SELECT spa.* FROM SF_SERVICE_PRODUCT_AUTH spa WHERE spa.ORGANIZATION_ID = #{curUserOrg} AND sp.ID = spa.SERVICEPRODUCT_ID AND spa.CAN_USE = '0'))
+        UNION
+        SELECT ssp.PROCESSINSTANCE_ID  prid
+        FROM SF_SP_PROCESSINSTANCE ssp
+        INNER JOIN SF_SERVICE_PRODUCT sp ON sp.ID = ssp.SERVICEPRODUCT_ID
+        INNER JOIN BPM_PROCESS bp ON bp.ID = sp.FLOW_ID
+        INNER JOIN FM_FORM ff ON ff.ID = bp.FORM_ID
+        WHERE 1=1
+        <if test="serviceCategoryId != null">AND  ff.SERVICE_CATEGORY_ID ='${serviceCategoryId}'</if>
+        AND EXISTS(
+        SELECT * FROM  BPM_PROCESS_INSTANCE bpit WHERE bpit.ID = ssp.PROCESSINSTANCE_ID  AND bpit.PARENT_PROCESS_INSTANCE_ID IS NOT NULL
+        )
+        AND EXISTS (
+        SELECT * FROM    BPM_PROCESS_INSTANCE  bpit1 join BPM_PROCESS bp1 ON bpit1.PROCESS_ID = bp1.ID
+        INNER JOIN FM_FORM ff1 ON (ff1.ID = bp1.FORM_ID
+        <if test="serviceCategoryId != null">AND  ff1.SERVICE_CATEGORY_ID ='${serviceCategoryId}'</if>
+        )
+        WHERE  ssp.PROCESSINSTANCE_ID  = bpit1.ID
+        )
+        AND(
+        EXISTS (
+        SELECT 1 FROM SYS_USER u
+        WHERE EXISTS (SELECT 1 FROM BPM_NODE_HISTORY bnh WHERE bnh.PROCESS_INSTANCE_ID = ssp.processinstance_id AND u.ID = bnh.IMPLEMENTER_ID)
+        AND u.ORGANIZATION_ID IN
+        <foreach item="item" index="index" collection="list"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        )
+        OR EXISTS (SELECT spa.* FROM SF_SERVICE_PRODUCT_AUTH spa WHERE spa.ORGANIZATION_ID = #{curUserOrg} AND sp.ID = spa.SERVICEPRODUCT_ID AND spa.CAN_USE = '0'))
+        ) temp
+        ON bpi.ID = temp.prid WHERE bpi.STATES != 1
+        ORDER BY ff.SERVICE_CATEGORY_ID DESC
+    </select>
+    <select id="queryFormInfo" parameterType="Map" resultMap="myworkMap">
+        SELECT bpi.ID AS PROCESS_INSTANCE_ID,bpi.CASE_NO AS CASE_NO,bpi.CASE_SUBJECT AS SUBJECT,bpi.CURRENT_NODE,bpi.STATES AS STATUS,u.NAME AS CREATOR, bpi.CREATE_TIME,scn.NAME AS PRODUCT
+        <if test="serviceCategoryId != 6">,sdi.name as priority</if>
+        FROM BPM_PROCESS_INSTANCE bpi
+        INNER JOIN SYS_USER u ON u.ID = bpi.CREATOR
+        INNER JOIN FM_FORM_VERSION ffv ON ffv.ID = bpi.FORM_VERSION_ID
+        INNER JOIN FM_FORM ff ON ff.ID = ffv.FORM_ID
+        INNER JOIN SF_SERVICE_CATEGORY ssc ON ssc.ID=ff.SERVICE_CATEGORY_ID
+        <if test="serviceCategoryId != 6">
+            LEFT JOIN SYS_DICT_ITEM sdi ON sdi.ID = bpi.CASE_PRIORITY
+        </if>
+        INNER JOIN SF_SP_PROCESSINSTANCE ssp ON ssp.PROCESSINSTANCE_ID = bpi.ID
+        INNER JOIN SF_SERVICE_PRODUCT scn ON scn.ID=  ssp.SERVICEPRODUCT_ID
+
+        INNER JOIN
+        (
+        SELECT bnh.PROCESS_INSTANCE_ID piid,bnh.ROLE_BY_AREA_FLAG,'-999'  org FROM BPM_NODE_HISTORY bnh WHERE bnh.RUN_FLAG = '1' AND bnh.IMPLEMENTER_ID =#{userId} AND bnh.IMPLEMENT_ROLE_TYPE IS NOT NULL AND bnh.STATUS !='8'
+        UNION
+        SELECT bnh.PROCESS_INSTANCE_ID piid,bnh.ROLE_BY_AREA_FLAG,'-999'  org FROM BPM_NODE_HISTORY bnh
+        LEFT JOIN BPM_PROCESS_INSTANCE T2 ON bnh.PROCESS_INSTANCE_ID=T2.ID
+        LEFT JOIN SYS_USER_REGION T3 ON T2.REGION_ID = T3.REGION_ID
+        WHERE bnh.IMPLEMENT_ROLE_TYPE = 'GROUP_ROLE' AND bnh.RUN_FLAG = '1' AND bnh.STATUS !='8'
+        AND T3.USER_ID = #{userId}
+        AND (IMPLEMENTER_ID IS NULL OR IMPLEMENTER_ID='')  AND bnh.IMPLEMENT_GROUP_ID IN (
+        SELECT sgu.GROUP_ID FROM SYS_GROUP_USER sgu WHERE sgu.USER_ID = (SELECT su.ID FROM SYS_USER su WHERE su.ID = #{userId} AND su.PAUSE_ORDERS = 1 )
+        )
+        UNION
+        SELECT PROCESS_INSTANCE_ID piid,'0' ROLE_BY_AREA_FLAG,'-999'  org FROM BPM_SIGNING WHERE SIGNER_ID IS NULL and COUNTER_SIGNER_ID = #{userId}
+        UNION
+        SELECT bnh.PROCESS_INSTANCE_ID piid,bnh.ROLE_BY_AREA_FLAG,utemp.org  org
+        FROM BPM_NODE_HISTORY bnh
+        JOIN ( SELECT ROLE_ID,su.ORGANIZATION_ID  org FROM SYS_USER_ROLE syr,SYS_USER su WHERE syr.USER_ID = #{userId} AND syr.USER_ID = su.ID AND su.PAUSE_ORDERS = 1 ) utemp
+        ON  (bnh.IMPLEMENT_ROLE_TYPE = 'SYSTEM_ROLE'  AND bnh.RUN_FLAG = '1' AND (IMPLEMENTER_ID IS NULL OR IMPLEMENTER_ID='')  AND bnh.IMPLEMENT_GROUP_ID = utemp.ROLE_ID AND bnh.STATUS !='8')
+        LEFT JOIN BPM_PROCESS_INSTANCE T2 ON bnh.PROCESS_INSTANCE_ID=T2.ID
+        LEFT JOIN SYS_USER_REGION T3 ON T2.REGION_ID = T3.REGION_ID
+        WHERE T3.USER_ID = #{userId}
+        UNION
+        SELECT bnh.PROCESS_INSTANCE_ID piid,bnh.ROLE_BY_AREA_FLAG,'-999'  org FROM BPM_NODE_HISTORY bnh WHERE bnh.IMPLEMENT_ROLE_TYPE = 'REVIEW_ROLE' AND bnh.RUN_FLAG = '1' AND bnh.STATUS !='8' AND EXISTS(SELECT ID FROM BPM_REVIEW_INFO WHERE NODE_HISTORY_ID=bnh.ID AND OPT_TIME IS NULL AND OPT_PERSON_ID='${userId}')
+        UNION
+        SELECT bnh.PROCESS_INSTANCE_ID piid,bnh.ROLE_BY_AREA_FLAG,utemp.org  org
+        FROM BPM_NODE_HISTORY bnh
+        JOIN ( SELECT ROLE_ID,su.ORGANIZATION_ID as org FROM SYS_USER_ROLE syr,SYS_USER su WHERE syr.USER_ID = #{userId} AND syr.USER_ID = su.ID  ) utemp
+        ON  (bnh.ASIDE_GROUP = utemp.ROLE_ID) AND bnh.RUN_FLAG = '1' AND bnh.STATUS ='8'
+        LEFT JOIN BPM_PROCESS_INSTANCE T2 ON bnh.PROCESS_INSTANCE_ID=T2.ID
+        LEFT JOIN SYS_USER_REGION T3 ON T2.REGION_ID = T3.REGION_ID
+        WHERE T3.USER_ID = #{userId}
+        ) qnitemp on bpi.ID = qnitemp.piid
+
+        WHERE bpi.STATES != 1
+        <if test="processInstanceID != null">
+            AND bpi.ID != #{processInstanceID}
+            AND bpi.ID NOT IN (SELECT M_PROCESS_INSTANCE_ID FROM BPM_PROCESS_RELATION WHERE N_PROCESS_INSTANCE_ID =#{processInstanceID}
+            UNION ALL
+            SELECT N_PROCESS_INSTANCE_ID FROM BPM_PROCESS_RELATION WHERE M_PROCESS_INSTANCE_ID =#{processInstanceID})
+        </if>
+        <if test="rela != null">AND bpi.STATES !=0 </if>
+        <if test="caseNo != null">AND bpi.CASE_NO like CONCAT('%','${caseNo}','%')</if>
+        <if test="subject != null">AND bpi.CASE_SUBJECT like CONCAT('%','${subject}','%')</if>
+        <if test="serviceCategoryId != 6">
+            <if test="priority != null">AND bpi.CASE_PRIORITY='${priority}'</if>
+        </if>
+        <if test="states != null">AND bpi.STATES ='${states}'</if>
+        <if test="creator != null">AND u.NAME like CONCAT('%','${creator}','%')</if>
+        <if test="startTime != null">AND bpi.CREATE_TIME >'${startTime}'</if>
+        <if test="endTime != null"><![CDATA[AND bpi.CREATE_TIME <'${endTime}']]></if>
+        <if test="serviceCategoryId != null">AND scn.SERVICE_CATEGORY_ID=#{serviceCategoryId}</if>
+        ORDER BY bpi.CREATE_TIME DESC
+    </select>
+
+    <select id="getOrgIdByProcessDefId" parameterType="Integer" resultType="Integer">
+        SELECT ORGANIZATION_ID FROM BPM_PROCESS bp WHERE  EXISTS (SELECT * FROM  BPM_PROCESS_VERSION  bpv WHERE bpv.ID = #{id} AND bpv.PROCESS_ID = bp.ID)
+    </select>
+
+</mapper>

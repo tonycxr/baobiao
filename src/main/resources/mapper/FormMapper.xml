@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.FormMapper">
+
+    <resultMap id="fmForm" type="com.sungcor.baobiao.entity.FMForm">
+        <result property="id" column="ID" />
+        <result property="name" column="NAME" />
+        <result property="code" column="CODE" />
+        <result property="description" column="DESCRIPTION" />
+        <result property="createUser" column="CREATE_USER" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="modifyUser" column="MODIFY_USER" />
+        <result property="modifyTime" column="MODIFY_TIME" />
+        <result property="type" column="SERVICE_CATEGORY_ID" />
+        <result property="policyID" column="PRIORITY_POLICY_ID" />
+        <result property="orgID" column="ORGANIZATION_ID" />
+        <result property="versionID" column="FORM_VERSION_ID" />
+        <result property="status" column="STATUS" />
+        <result property="parentID" column="PARENT_ID" />
+        <result property="instanceTableName" column="INSTANCE_TABLE" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.sungcor.baobiao.entity.FMForm" >
+        INSERT INTO FM_FORM (CODE, NAME, DESCRIPTION , CREATE_USER , CREATE_TIME , MODIFY_USER , MODIFY_TIME,
+        SERVICE_CATEGORY_ID,PRIORITY_POLICY_ID,ORGANIZATION_ID,FORM_VERSION_ID,STATUS,PARENT_ID,INSTANCE_TABLE)
+        VALUES (#{code}, #{name}, #{description} , #{createUser} , #{createTime} , #{modifyUser} , #{modifyTime},
+        #{type}, #{policyID}, #{orgID} , #{versionID} , #{status}, #{parentID} , #{instanceTableName})
+        <selectKey resultType="int" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <delete id="delete" parameterType="com.sungcor.baobiao.entity.FMForm">
+        DELETE FROM FM_FORM WHERE ID=#{id}
+    </delete>
+
+    <select id="search" parameterType="Map" resultMap="fmForm">
+        SELECT * FROM FM_FORM WHERE  PARENT_ID IS NULL OR PARENT_ID=0
+        AND ORGANIZATION_ID IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="name != null"> AND NAME LIKE CONCAT('%','${name}','%')</if>
+        <if test="type != null"> AND SERVICE_CATEGORY_ID=#{type}</if>
+        limit #{beginRow},#{pageRowCnt}
+    </select>
+
+    <select id="getFMForm" parameterType="com.sungcor.baobiao.entity.FMForm" resultMap="fmForm">
+        SELECT * FROM FM_FORM WHERE ID=#{id}
+    </select>
+
+    <update id="update" parameterType="com.sungcor.baobiao.entity.FMForm">
+        UPDATE FM_FORM SET CODE=#{code},NAME=#{name},DESCRIPTION=#{description},MODIFY_USER=#{modifyUser},MODIFY_TIME=#{modifyTime},
+                           SERVICE_CATEGORY_ID=#{type},PRIORITY_POLICY_ID=#{policyID},ORGANIZATION_ID=#{orgID},FORM_VERSION_ID=#{versionID},STATUS=#{status},PARENT_ID=#{parentID},INSTANCE_TABLE=#{instanceTableName}
+        WHERE ID=#{id}
+    </update>
+
+    <select id="getFMFormCount" parameterType="Map" resultType="hashMap">
+        SELECT COUNT(*) as formCount FROM FM_FORM WHERE PARENT_ID IS NULL OR PARENT_ID=0
+        AND ORGANIZATION_ID IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="name != null"> AND NAME LIKE CONCAT('%','${name}','%')</if>
+        <if test="type != null"> AND SERVICE_CATEGORY_ID=#{type}</if>
+    </select>
+
+    <select id="checkDelete" parameterType="Integer" resultType="Integer">
+        SELECT COUNT(*) FROM BPM_PROCESS WHERE FORM_ID=#{formID}
+    </select>
+
+    <select id="getFMFormByCode" parameterType="com.sungcor.baobiao.entity.FMForm" resultMap="fmForm">
+        SELECT * FROM FM_FORM WHERE NAME=#{name}
+    </select>
+
+
+    <select id="listFormBySCID" parameterType="int" resultMap="fmForm">
+        SELECT ff.* FROM FM_FORM ff WHERE ff.SERVICE_CATEGORY_ID = #{id}
+                                      AND EXISTS (SELECT ffv.ID FROM FM_FORM_VERSION ffv WHERE ffv.FORM_ID = ff.ID AND ffv.ISPUBLISH = 1 )
+    </select>
+
+    <select id="listFormBySCIDAndOrg" parameterType="map" resultMap="fmForm">
+        SELECT ff.* FROM FM_FORM ff WHERE ff.SERVICE_CATEGORY_ID = #{id}
+        AND EXISTS (SELECT ffv.ID FROM FM_FORM_VERSION ffv WHERE ffv.FORM_ID = ff.ID AND ffv.ISPUBLISH = 1 )
+        AND ff.ORGANIZATION_ID IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getFormByTable" parameterType="map" resultType="map">
+        SELECT * FROM ${table} ff WHERE ff.id = #{id}
+    </select>
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sungcor.baobiao.report.mapper.ReportCustomIndexMapper">
+
+    <select id="getById" parameterType="int"
+            resultType="com.sungcor.baobiao.report.bean.ReportCustomIndexBean">
+        SELECT ID "id",TYPEID "typeId",NAME "name",
+               EXPRESSION_INDEX "expressionIndex",EXPRESSION_FIELD "expressionField",EXPRESSION_NAME "expressionName",
+               SUFFIX "suffix",STATUS "status"
+        FROM REPORT_CUSTOM_INDEX_T WHERE ID = #{id}
+    </select>
+
+    <insert id="addCusIndex" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.sungcor.baobiao.report.bean.ReportCustomIndexBean" >
+        INSERT INTO REPORT_CUSTOM_INDEX_T
+        (ID,TYPEID,NAME,EXPRESSION_INDEX,EXPRESSION_FIELD,EXPRESSION_NAME,
+         SUFFIX,CREATE_USER,CREATE_TIME,MODIFY_USER,MODIFY_TIME)
+        VALUES
+        (#{id},#{typeId},#{name},#{expressionIndex},#{expressionField},#{expressionName},
+         #{suffix},#{createUser},NOW(),#{createUser},
+         NOW())
+    </insert>
+
+    <update id="updateCusIndex" parameterType="com.sungcor.baobiao.report.bean.ReportCustomIndexBean">
+        UPDATE REPORT_CUSTOM_INDEX_T SET
+        <if test="typeId!=null">TYPEID = #{typeId},</if>
+        <if test="name!=null">NAME = #{name},</if>
+        <if test="expressionIndex!=null">EXPRESSION_INDEX = #{expressionIndex},</if>
+        <if test="expressionField!=null">EXPRESSION_FIELD = #{expressionField},</if>
+        <if test="expressionName!=null">EXPRESSION_NAME = #{expressionName},</if>
+        <if test="suffix!=null">SUFFIX = #{suffix},</if>
+        MODIFY_USER = #{modifyUser},
+        MODIFY_TIME = NOW()
+        WHERE ID= #{id}
+    </update>
+
+    <delete id="deleteCusIndex" parameterType="java.util.ArrayList">
+        DELETE FROM REPORT_CUSTOM_INDEX_T WHERE ID
+        IN
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="queryCusIndex" parameterType="hashMap"
+            resultType="com.sungcor.baobiao.report.bean.ReportCustomIndexBean">
+        SELECT T1.ID "id",T1.TYPEID "typeId",T1.NAME "name",T6.NAME "typeName",
+        T1.STATUS "status",T4.NAME "createUserName",T1.CREATE_TIME "createTime",T5.NAME "modifyUserName",T1.MODIFY_TIME "modifyTime"
+        FROM REPORT_CUSTOM_INDEX_T T1
+        LEFT JOIN SYS_USER T4 ON T4.ID = T1.CREATE_USER
+        LEFT JOIN SYS_USER T5 ON T5.ID = T1.MODIFY_USER
+        LEFT JOIN REPORT_TYPE_T T6 ON T6.ID = T1.TYPEID
+        WHERE T1.STATUS = 1<if test="name!=null"> AND T1.NAME LIKE CONCAT('%',#{name},'%')</if>
+        <if test="typeId!=null">ANDT T1.YPEID = #{typeId}</if>
+        LIMIT ${beginRow},${pageRowCnt}
+    </select>
+
+    <select id="queryCusIndexCount" parameterType="hashMap" resultType="int">
+        SELECT COUNT(1)
+        FROM REPORT_CUSTOM_INDEX_T WHERE STATUS = 1
+        <if test="NAME!=null">AND NAME LIKE CONCAT('%',#{name},'%')</if>
+        <if test="typeId!=null">ANDTYPEID = #{typeId}</if>
+    </select>
+
+    <delete id="deleteStatIndexByField" parameterType="String">
+        DELETE FROM REPORT_STATISTICAL_INDEX_T WHERE  FIELD_NAME = #{field}
+    </delete>
+
+    <select id="existIndexByStat" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM REPORT_STATISTICAL_INDEX_T WHERE  FIELD_NAME = #{field}
+    </select>
+</mapper>

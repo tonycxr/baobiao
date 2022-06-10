@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sungcor.baobiao.report.mapper.ReportChartMapper">
+
+    <select id="queryTypeList" resultType="com.sungcor.baobiao.report.bean.ReportChartTypeBean">
+        SELECT ID "id",NAME "name" FROM REPORT_CHART_TYPE_T
+    </select>
+
+    <update id="updateModel" parameterType="com.sungcor.baobiao.report.bean.ReportModelBean">
+        UPDATE REPORT_MODEL_T SET SHOWTABLE=#{showTable},SHOWCHART=#{showChart} WHERE ID = #{id}
+    </update>
+
+    <select id="queryChart" parameterType="int"
+            resultType="com.sungcor.baobiao.report.bean.ReportChartModelBean">
+        SELECT ID "id", MODELID "modelId",TYPEID "typeId",TYPENAME "typeName",INDEX_IDS "indexIds",TITLE "title"
+        FROM REPORT_CHART_MODEL_T WHERE MODELID = #{id} ORDER BY SORT
+    </select>
+
+    <select id="queryChartById" parameterType="int"
+            resultType="com.sungcor.baobiao.report.bean.ReportChartModelBean">
+        SELECT ID "id", MODELID "modelId",TYPEID "typeId",TYPENAME "typeName",INDEX_IDS "indexIds",TITLE "title"
+        FROM REPORT_CHART_MODEL_T WHERE ID = #{id}
+    </select>
+
+    <insert id="insertList" parameterType="java.util.ArrayList">
+        INSERT INTO REPORT_CHART_MODEL_T (MODELID,TYPEID,TYPENAME,INDEX_IDS,TITLE,SORT) VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.modelId},#{item.typeId},#{item.typeName},#{item.indexIds},#{item.title},#{item.sort})
+        </foreach>
+    </insert>
+
+    <delete id="deleteChartByModelId" parameterType="int">
+        DELETE FROM REPORT_CHART_MODEL_T WHERE MODELID = #{modelId}
+    </delete>
+
+    <delete id="deleteChartById" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_CHART_MODEL_T WHERE ID IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="queryIsIndex" parameterType="com.sungcor.baobiao.report.bean.ReportChartModelBean"
+            resultType="int">
+        SELECT COUNT(*) FROM REPORT_CHART_MODEL_T WHERE MODELID = #{modelId} AND INDEX_IDS LIKE CONCAT('%',#{indexIds},'%')
+    </select>
+
+    <insert id="copyChartIndex" parameterType="hashMap">
+        INSERT INTO REPORT_CHART_MODEL_T (MODELID,TYPEID,TYPENAME,INDEX_IDS,TITLE,SORT)
+        SELECT #{n_modelId},TYPEID,TYPENAME,INDEX_IDS,TITLE,SORT FROM REPORT_CHART_MODEL_T WHERE MODELID = #{o_modelId}
+    </insert>
+</mapper>

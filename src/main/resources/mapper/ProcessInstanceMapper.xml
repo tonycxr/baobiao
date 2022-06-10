@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.ProcessInstanceMapper">
+
+    <resultMap id="processInstanceBeanMap" type="com.sungcor.baobiao.entity.ProcessInstance">
+        <result property="id" column="ID" />
+        <result property="processID" column="PROCESS_ID" />
+        <result property="states" column="STATES" />
+        <result property="creatorID" column="CREATOR" />
+        <result property="createTime" column="CREATE_TIME"   />
+        <result property="currentNodeName" column="CURRENT_NODE" />
+        <result property="enterTime" column="ENTER_TIME" />
+        <result property="leaveTime" column="LEVAE_TIME" />
+        <result property="processDefinitionID" column="PROCESS_DEFINITION_ID" />
+        <result property="formInstanceID" column="FORM_INSTANCE_ID" />
+        <result property="formVersionID" column="FORM_VERSION_ID" />
+        <result property="jbpmProcessInstanceID" column="JBPM_PROCESS_INSTANCE_ID" />
+        <result property="forkFlag" column="FORK_FLAG" />
+        <result property="parentProcessInsID" column="PARENT_PROCESS_INSTANCE_ID" />
+        <result property="hangNodeInstanceID" column="HANG_NODE_INSTANCE_ID" />
+        <result property="hangProcessInstanceID" column="HANG_PROCESS_INSTANCE_ID" />
+        <result property="hangMode" column="HANG_MODE" />
+        <result property="dealTime" column="DEAL_TIME" />
+        <result property="dealFlag" column="DEAL_FALG" />
+        <result property="responseTime" column="RESPONSE_TIME" />
+        <result property="caseNO" column="CASE_NO" />
+        <result property="reporter" column="REPORTER" />
+        <result property="caseSubject" column="CASE_SUBJECT" />
+        <result property="casePriority" column="CASE_PRIORITY" />
+        <result property="taskPriority" column="TASK_PRIORITY" />
+        <result property="caseArea" column="CASE_AREA" />
+        <result property="signTime" column="SIGN_TIME" />
+        <result property="caseUrgency" column="CASE_URGENCY" />
+        <result property="olaResponseTime" column="OLA_RESPONSE_TIME" />
+        <result property="olaSoluteTime" column="OLA_SOLUTE_TIME" />
+        <result property="slaResponseTime" column="SLA_RESPONSE_TIME" />
+        <result property="slaSoluteTime" column="SLA_SOLUTE_TIME" />
+        <result property="toKnowledgeFlag" column="TO_KNOWLEDGE_FLAG" />
+        <result property="outKnow" column="OUT_KNOW" />
+        <result property="reporterName" column="REPORTERNAME" />
+        <result property="reporterSource" column="REPORTERSOURCE" />
+        <result property="serviceCategoryID" column="SERVICE_CATEGORY_ID" />
+        <result property="slaStatus" column="SLA_STATUS" />
+        <result property="surplusTime" column="SURPLUSTIME" />
+        <result property="closeFlag" column="CLOSE_FLAG" />
+        <result property="regionId" column="REGION_ID" />
+        <result property="organizationId" column="ORGANIZATION_ID" />
+        <result property="selfdesk" column="SELFDESK" />
+        <result property="reopenFlag" column="REOPEN_FLAG" />
+        <result property="reopenCaseNO" column="REOPEN_CASE_NO" />
+        <result property="reopenReason" column="REOPEN_REASON" />
+        <result property="slaResponseEndTime" column="SLA_RESPONSE_END_TIME" />
+        <result property="slaSoluteEndTime" column="SLA_SOLUTE_END_TIME" />
+    </resultMap>
+
+    <resultMap id="serviceCategoryBeanMap" type="com.sungcor.baobiao.entity.ServiceCategory">
+        <result property="id" column="ID" />
+        <result property="code" column="CODE" />
+        <result property="name" column="Name" />
+        <result property="sysFlag" column="sysFlag" />
+    </resultMap>
+
+
+    <select id="get" parameterType="int" resultMap="processInstanceBeanMap">
+        SELECT  *
+        FROM BPM_PROCESS_INSTANCE
+        WHERE ID=#{id}
+    </select>
+
+    <select id="getSLAByPID" parameterType="int" resultMap="processInstanceBeanMap">
+        SELECT  FUNC_GETOLAVALUE(ID,CASE_PRIORITY,'1') OLA_RESPONSE_TIME , FUNC_GETOLAVALUE(ID,CASE_PRIORITY,'2') OLA_SOLUTE_TIME,FUNC_GETSLAVALUE(ID,CASE_PRIORITY,'1') SLA_RESPONSE_TIME, FUNC_GETSLAVALUE(ID,CASE_PRIORITY,'2') SLA_SOLUTE_TIME
+        FROM BPM_PROCESS_INSTANCE
+        WHERE ID=#{id}
+    </select>
+
+    <select id="getBaseInfo" parameterType="int" resultMap="processInstanceBeanMap">
+        SELECT ID,  PROCESS_ID, STATES, CREATOR ,  CREATE_TIME , CURRENT_NODE ,
+        ENTER_TIME,LEVAE_TIME,PROCESS_DEFINITION_ID, FORM_INSTANCE_ID, FORM_VERSION_ID, JBPM_PROCESS_INSTANCE_ID , FORK_FLAG,
+        PARENT_PROCESS_INSTANCE_ID,HANG_NODE_INSTANCE_ID,HANG_PROCESS_INSTANCE_ID,HANG_MODE,DEAL_TIME, DEAL_FALG,
+        RESPONSE_TIME,CASE_NO,REPORTER,CASE_SUBJECT,CASE_PRIORITY,SIGN_TIME,CASE_URGENCY,CASE_AREA,TASK_PRIORITY,REPORTERNAME,REPORTERSOURCE,INCIDTYPE,PLANENDTIME,SLA_STATUS,SURPLUSTIME,SERVICE_CATEGORY_ID,CLOSE_FLAG,REGION_ID,ORGANIZATION_ID,
+        REOPEN_FLAG,REOPEN_CASE_NO,REOPEN_REASON,SLA_RESPONSE_END_TIME,SLA_SOLUTE_END_TIME
+        FROM BPM_PROCESS_INSTANCE
+        WHERE ID=#{id}
+    </select>
+
+    <insert id="save" parameterType="com.sungcor.baobiao.entity.ProcessInstance" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BPM_PROCESS_INSTANCE (PROCESS_ID, STATES, CREATOR ,  CREATE_TIME , CURRENT_NODE ,
+        ENTER_TIME,LEVAE_TIME,PROCESS_DEFINITION_ID, FORM_INSTANCE_ID, FORM_VERSION_ID, JBPM_PROCESS_INSTANCE_ID , FORK_FLAG,
+        PARENT_PROCESS_INSTANCE_ID,HANG_NODE_INSTANCE_ID,HANG_PROCESS_INSTANCE_ID,HANG_MODE,DEAL_TIME, DEAL_FALG,
+        RESPONSE_TIME,CASE_NO,REPORTER,CASE_SUBJECT,CASE_PRIORITY,SIGN_TIME,CASE_URGENCY,CASE_AREA,TASK_PRIORITY,REPORTERNAME,REPORTERSOURCE,INCIDTYPE,PLANENDTIME,SERVICE_CATEGORY_ID,REGION_ID,ORGANIZATION_ID,SELFDESK,REOPEN_FLAG,REOPEN_CASE_NO,REOPEN_REASON)
+        VALUES (#{processID,jdbcType=DECIMAL}, #{states,jdbcType=VARCHAR}, #{creatorID,jdbcType=VARCHAR} , #{createTime,jdbcType=TIMESTAMP} , #{currentNodeName,jdbcType=VARCHAR} , #{enterTime,jdbcType=TIMESTAMP} , #{leaveTime,jdbcType=TIMESTAMP},
+        #{processDefinitionID,jdbcType=DECIMAL},#{formInstanceID,jdbcType=DECIMAL},#{formVersionID,jdbcType=DECIMAL},#{jbpmProcessInstanceID,jdbcType=VARCHAR},#{forkFlag,jdbcType=VARCHAR},
+        #{parentProcessInsID,jdbcType=DECIMAL},#{hangNodeInstanceID,jdbcType=DECIMAL}
+        ,#{hangProcessInstanceID,jdbcType=DECIMAL}, #{hangMode,jdbcType=VARCHAR} ,#{dealTime,jdbcType=VARCHAR},#{dealFlag,jdbcType=VARCHAR},#{responseTime,jdbcType=VARCHAR},#{caseNO},
+        #{reporter},
+        #{caseSubject},
+        #{casePriority},
+        #{signTime},
+        #{caseUrgency},
+        #{caseArea},
+        #{taskPriority},
+        #{reporterName},
+        #{reporterSource},
+        #{incidenttype},
+        #{planendtime},
+        #{serviceCategoryID},
+        #{regionId},
+        #{organizationId},
+        #{selfdesk,jdbcType=VARCHAR},
+        #{reopenFlag,jdbcType=VARCHAR},
+        #{reopenCaseNO,jdbcType=VARCHAR},
+        #{reopenReason,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.sungcor.baobiao.entity.ProcessInstance">
+        UPDATE BPM_PROCESS_INSTANCE
+        <set>
+            <if test="states != null and states != ''">STATES=#{states},</if>
+            <if test="enterTime != null">ENTER_TIME=#{enterTime},</if>
+            <if test="leaveTime != null">LEVAE_TIME=#{leaveTime},</if>
+            <if test="formInstanceID != null">FORM_INSTANCE_ID=#{formInstanceID},</if>
+            <if test="formVersionID != null">FORM_VERSION_ID=#{formVersionID},</if>
+            <if test="dealTime != null">DEAL_TIME=#{dealTime},</if>
+            <if test="responseTime != null">RESPONSE_TIME=#{responseTime},</if>
+            <if test="currentNodeName != null">CURRENT_NODE=#{currentNodeName},</if>
+            <if test="jbpmProcessInstanceID != null">JBPM_PROCESS_INSTANCE_ID=#{jbpmProcessInstanceID},</if>
+            <if test="forkFlag != null">FORK_FLAG=#{forkFlag},</if>
+            <if test="dealFlag != null">DEAL_FALG=#{dealFlag},</if>
+            <if test="parentProcessInsID != null">PARENT_PROCESS_INSTANCE_ID=#{parentProcessInsID},</if>
+            <if test="hangNodeInstanceID != null">HANG_NODE_INSTANCE_ID=#{hangNodeInstanceID},</if>
+            <if test="hangProcessInstanceID != null">HANG_PROCESS_INSTANCE_ID=#{hangProcessInstanceID},</if>
+            <if test="hangMode != null">HANG_MODE=#{hangMode},</if>
+            <if test="reporter != null">REPORTER=#{reporter},</if>
+            <if test="caseSubject != null">CASE_SUBJECT=#{caseSubject},</if>
+            <if test="casePriority != null">CASE_PRIORITY=#{casePriority},</if>
+            <if test="taskPriority != null">TASK_PRIORITY=#{taskPriority},</if>
+            <if test="signTime != null">SIGN_TIME=#{signTime},</if>
+            <if test="caseUrgency != null">CASE_URGENCY=#{caseUrgency},</if>
+            <if test="caseArea != null">CASE_AREA=#{caseArea},</if>
+            <if test="signTime != null">SIGN_TIME=#{signTime},</if>
+            <if test="toKnowledgeFlag != null">TO_KNOWLEDGE_FLAG=#{toKnowledgeFlag},</if>
+            <if test="outKnow != null">OUT_KNOW=#{outKnow},</if>
+            <if test="reporterName != null">REPORTERNAME=#{reporterName},</if>
+            <if test="reporterSource != null">REPORTERSOURCE=#{reporterSource},</if>
+            <if test="incidenttype != null">INCIDTYPE=#{incidenttype},</if>
+            <if test="planendtime != null">PLANENDTIME=#{planendtime},</if>
+            <if test="slaStatus != null">SLA_STATUS=#{slaStatus},</if>
+            <if test="surplusTime != null">SURPLUSTIME=#{surplusTime},</if>
+            <if test="closeFlag != null">CLOSE_FLAG=#{closeFlag},</if>
+            <if test="regionId != null">REGION_ID=#{regionId},</if>
+            <if test="organizationId != null">ORGANIZATION_ID=#{organizationId},</if>
+            <if test="olaResponseTime != null">OLA_RESPONSE_TIME=#{olaResponseTime},</if>
+            <if test="olaSoluteTime != null">OLA_SOLUTE_TIME=#{olaSoluteTime},</if>
+            <if test="slaResponseTime != null">SLA_RESPONSE_TIME=#{slaResponseTime},</if>
+            <if test="slaSoluteTime != null">SLA_SOLUTE_TIME=#{slaSoluteTime},</if>
+            <if test="slaResponseEndTime != null">SLA_RESPONSE_END_TIME=#{slaResponseEndTime},</if>
+            <if test="slaSoluteEndTime != null">SLA_SOLUTE_END_TIME=#{slaSoluteEndTime},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <select id="countByPidAndHangModel" parameterType="Map" resultType="int">
+        SELECT COUNT(1) FROM BPM_PROCESS_INSTANCE WHERE
+        HANG_PROCESS_INSTANCE_ID=#{hangPID} AND HANG_MODE=#{hangMode}
+        AND (STATES != '0' AND STATES != '-1')
+    </select>
+
+    <select id="countByHangModel" parameterType="Map" resultType="int">
+        SELECT COUNT(1) FROM BPM_PROCESS_INSTANCE WHERE (STATES != '0' AND STATES != '-1')
+        AND ID IN(
+        SELECT N_PROCESS_INSTANCE_ID
+        FROM BPM_PROCESS_RELATION WHERE HANG_CODE=#{hangMode}
+        AND M_PROCESS_INSTANCE_ID = #{hangPID} AND RELA_TYPE = '1'
+        UNION ALL
+        SELECT M_PROCESS_INSTANCE_ID FROM BPM_PROCESS_RELATION
+        WHERE HANG_CODE=#{hangMode}
+        AND N_PROCESS_INSTANCE_ID = #{hangPID} AND RELA_TYPE = '0')
+
+    </select>
+
+<!--    <resultMap id="transitionMap" type="java.util.HashMap">-->
+<!--        <result property="activityName" column="ACTIVITY_NAME_" />-->
+<!--        <result property="transition" column="TRANSITION_" />-->
+<!--    </resultMap>-->
+<!--    <select id="getRunOverTransitions" parameterType="Integer" resultMap="transitionMap">-->
+<!--        SELECT ACTIVITY_NAME_ , TRANSITION_-->
+<!--        FROM JBPM4_HIST_ACTINST-->
+<!--        WHERE  EXECUTION_= (SELECT JBPM_PROCESS_INSTANCE_ID FROM BPM_PROCESS_INSTANCE WHERE ID =#{processInstanceId} )-->
+<!--    </select>-->
+
+    <insert id="replaceSaveProcessRelation" parameterType="Map" >
+        REPLACE INTO BPM_PROCESS_RELATION(M_PROCESS_INSTANCE_ID,RELA_TYPE,N_PROCESS_INSTANCE_ID,HANG_CODE)
+        VALUES(#{pid},#{relatype},#{relaProIns},#{hangCode})
+    </insert>
+
+    <select id="getCongRelationProcessIds" parameterType="int" resultType="int">
+        SELECT DISTINCT A.ID FROM (
+        SELECT M_PROCESS_INSTANCE_ID AS ID FROM BPM_PROCESS_RELATION WHERE N_PROCESS_INSTANCE_ID=#{id} AND RELA_TYPE='0'
+        UNION
+        SELECT N_PROCESS_INSTANCE_ID AS ID FROM BPM_PROCESS_RELATION WHERE M_PROCESS_INSTANCE_ID=#{id} AND RELA_TYPE='1'
+        ) AS A
+    </select>
+
+    <select id="getRelationProcessIds" parameterType="int" resultType="int">
+        SELECT DISTINCT A.ID FROM (
+        SELECT M_PROCESS_INSTANCE_ID AS ID FROM BPM_PROCESS_RELATION WHERE N_PROCESS_INSTANCE_ID=#{id}
+        UNION
+        SELECT N_PROCESS_INSTANCE_ID AS ID FROM BPM_PROCESS_RELATION WHERE M_PROCESS_INSTANCE_ID=#{id}
+        ) AS A
+    </select>
+
+    <select id="getRelatedPI1" parameterType="Map" resultMap="processInstanceBeanMap">
+        SELECT * FROM  BPM_PROCESS_INSTANCE
+        WHERE  PARENT_PROCESS_INSTANCE_ID = #{processInstanceID} OR
+        (ID IN
+        <foreach item="item" index="index" collection="list"  open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        OR ID =(SELECT A.PARENT_PROCESS_INSTANCE_ID FROM BPM_PROCESS_INSTANCE A WHERE A.ID = #{processInstanceID})
+        )
+    </select>
+
+    <select id="getRelatedPI2" parameterType="int" resultMap="processInstanceBeanMap">
+        SELECT * FROM  BPM_PROCESS_INSTANCE
+        WHERE  PARENT_PROCESS_INSTANCE_ID = #{id}
+        OR  ID = (SELECT A.PARENT_PROCESS_INSTANCE_ID FROM BPM_PROCESS_INSTANCE A WHERE A.ID = #{id})
+    </select>
+
+    <select id="getServiceCategoryByPID" parameterType="int" resultMap="serviceCategoryBeanMap">
+        SELECT SEC.* FROM SF_SERVICE_CATEGORY  SEC  WHERE SEC.ID =(
+        SELECT FF.SERVICE_CATEGORY_ID FROM FM_FORM FF WHERE FF.ID = (
+        SELECT BP.FORM_ID FROM BPM_PROCESS BP WHERE BP.ID = (
+        SELECT BPI.PROCESS_ID FROM BPM_PROCESS_INSTANCE BPI WHERE BPI.ID = #{id}
+        )
+        )
+        )
+    </select>
+
+
+    <delete id="deleteProcessRelation" parameterType="Map">
+        DELETE FROM BPM_PROCESS_RELATION WHERE (M_PROCESS_INSTANCE_ID=#{mpid} AND N_PROCESS_INSTANCE_ID=#{npid})
+        OR (M_PROCESS_INSTANCE_ID=#{npid} AND N_PROCESS_INSTANCE_ID=#{mpid})
+    </delete>
+
+    <insert id="visitEvaluation" parameterType="Map">
+        INSERT INTO BPM_EVALUATION (PROCESS_INSTANCE_ID, CREATOR_ID, CREATE_TIME,  EVALUATION_LEVEL, DESCRIPTION, LOCK_USER,SELF_SERVICE_DESK_USER)
+        VALUES (#{processInstanceID}, #{creator}, #{createTime} , #{evaluationLevel} , #{description}, #{lockUser}, #{selfServiceUser})
+    </insert>
+
+    <select id="selectVisitEvaluation" parameterType="Integer" resultType="Map">
+        SELECT * FROM BPM_EVALUATION WHERE PROCESS_INSTANCE_ID = #{processInstanceID} LIMIT 0,1
+    </select>
+
+    <select id="deleteEvaluation" parameterType="Map" resultType="Integer">
+        DELETE FROM BPM_EVALUATION WHERE PROCESS_INSTANCE_ID = #{processInstanceID}
+        AND LOCK_USER = #{lockUser}
+    </select>
+
+    <select id="queryToDoSLA" parameterType="int" resultMap="processInstanceBeanMap" >
+        SELECT ID,CREATE_TIME,DEAL_TIME,STATES, OLA_RESPONSE_TIME ,
+        OLA_SOLUTE_TIME,SLA_RESPONSE_TIME,SLA_SOLUTE_TIME
+        FROM
+        BPM_PROCESS_INSTANCE
+        where <!--SERVICE_CATEGORY_ID in(1,2) and--> (STATES NOT in (-1,0,5)  OR (STATES = 0 AND  SLA_SOLUTE_TIME is not null AND SLA_STATUS IS NULL))
+        and SLA_SOLUTE_TIME is not null ORDER BY ID LIMIT #{page},100
+    </select>
+
+    <select id="findCloseCode" parameterType="String" resultType="String">
+        SELECT T2.NAME FROM BPM_PROCESS_RUNLOG T1
+        LEFT JOIN SYS_DICT_ITEM T2 ON T1.APPEND_ATT = T2.ID
+        WHERE OPT_TYPE = 'confirm' and T1.PROCESS_INSTANCE_ID = #{processInstanceID}
+    </select>
+
+    <select id="getProcessInstanceVoucherCount" parameterType="hashMap" resultType="int">
+        SELECT count(1) FROM BPM_PROCESS_INSTANCE bpi
+        INNER JOIN CMDB_STORE_VOUCHER csv ON csv.PROCESS_INSTANCE_ID = bpi.ID
+        WHERE csv.ID=#{voucherId}
+    </select>
+
+    <select id="getProcessInstanceVoucherList" parameterType="hashMap" resultMap="processInstanceBeanMap">
+        SELECT bpi.ID,bpi.CASE_PRIORITY,bpi.CREATOR,bpi.CREATE_TIME,bpi.CASE_SUBJECT FROM BPM_PROCESS_INSTANCE bpi
+        INNER JOIN CMDB_STORE_VOUCHER csv ON csv.PROCESS_INSTANCE_ID = bpi.ID
+        WHERE csv.ID=#{voucherId}
+        LIMIT #{from},#{end}
+    </select>
+
+    <select id="getProcessInstanceCiCount" parameterType="hashMap" resultType="int">
+        SELECT count(1) FROM BPM_PROCESS_INSTANCE bpi
+        INNER JOIN BPM_PROCESS_PEER bpp ON bpp.PROCESS_INSTANCE_ID=bpi.ID
+        INNER JOIN CMDB_CI cc ON cc.ID=bpp.PEER_ID
+        WHERE cc.ID=#{ciId}
+    </select>
+
+    <select id="getProcessInstanceCiList" parameterType="hashMap" resultMap="processInstanceBeanMap">
+        SELECT bpi.ID,bpi.CASE_PRIORITY,bpi.CREATOR,bpi.CREATE_TIME,bpi.CASE_SUBJECT FROM BPM_PROCESS_INSTANCE bpi
+        INNER JOIN BPM_PROCESS_PEER bpp ON bpp.PROCESS_INSTANCE_ID=bpi.ID
+        INNER JOIN CMDB_CI cc ON cc.ID=bpp.PEER_ID
+        WHERE cc.ID=#{ciId}
+        LIMIT #{from},#{end}
+    </select>
+
+    <select id="getSelfdesk" parameterType="hashMap" resultMap="processInstanceBeanMap">
+        SELECT ins.SELFDESK selfdesk FROM BPM_PROCESS_INSTANCE  ins WHERE ID=${processInstanceID}
+    </select>
+    <!--判断自助服务是否已全部处理完成-->
+    <select id="isSelfdesk" parameterType="hashMap" resultType="int">
+        <![CDATA[ SELECT count(1)  from BPM_PROCESS_INSTANCE WHERE SELFDESK=#{selfdesk} AND STATES<>0 AND ID<>${processInstanceID}]]>
+    </select>
+</mapper>

@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.FMFormFieldMapper">
+
+    <resultMap id="fmFormField" type="com.sungcor.baobiao.entity.FMFormField">
+        <result property="id" column="ID" />
+        <result property="areaID" column="AREA_ID" />
+        <result property="name" column="NAME" />
+        <result property="label" column="LABEL" />
+        <result property="renderType" column="RENDER_TYPE" />
+        <result property="tooltip" column="TOOLTIP" />
+        <result property="contentSize" column="SIZE" />
+        <result property="defaultValue" column="DEFAULT_VALUE" />
+        <result property="isRequired" column="ISREQUIRED" />
+        <result property="fullLine" column="FULL_LINE" />
+        <result property="rows" column="ROWS" />
+        <result property="dataSource" column="DATASOURCE" />
+        <result property="format" column="FORMAT" />
+        <result property="parentID" column="PARENT_FIELD_ID" />
+        <result property="parentAtt" column="PARENT_FIELD_ATT" />
+        <result property="fieldIDs" column="FIELD_IDS" />
+        <result property="evaRule" column="EVA_RULE" />
+        <result property="deleteFlag" column="DEL_FLAG" />
+        <result property="sysFlag" column="SYS_FLAG" />
+        <result property="sort" column="SORT" />
+        <result property="useFlag" column="USE_FLAG" />
+        <result property="comfmId" column="COM_FM_ID" />
+        <result property="conmle" column="CONMLE" />
+        <result property="cascadeType" column="CASCADE_TYPE" />
+        <result property="dataSourceAddress" column="DATASOURCE_ADDRESS" />
+    </resultMap>
+
+    <resultMap id="fmFormArea" type="com.sungcor.baobiao.entity.FMFormArea">
+        <result property="id" column="ID" />
+        <result property="versionID" column="FORM_VERSION_ID" />
+        <result property="title" column="TITLE" />
+        <result property="columnCount" column="COLUMN_COUNT" />
+        <result property="displayFlag" column="DISPLAY_FLAG" />
+        <result property="sort" column="SORT" />
+        <result property="deleteFlag" column="DELFLAG" />
+    </resultMap>
+    
+    
+    <insert id="insert" parameterType="com.sungcor.baobiao.entity.FMFormField" >
+        INSERT INTO FM_FIELD (AREA_ID, NAME, LABEL , RENDER_TYPE , TOOLTIP , SIZE,DEFAULT_VALUE,ISREQUIRED,
+        FULL_LINE,ROWS,DATASOURCE,FORMAT,PARENT_FIELD_ID,PARENT_FIELD_ATT,FIELD_IDS,EVA_RULE,DEL_FLAG,SYS_FLAG,SORT,COM_FM_ID,CASCADE_TYPE)
+        VALUES (#{areaID}, #{name}, #{label} ,#{renderType}, #{tooltip} , #{contentSize} , #{defaultValue},#{isRequired}, #{fullLine}, #{rows},
+        #{dataSource} , #{format} , #{parentID},
+        #{parentAtt}, #{fieldIDs}, #{evaRule} , #{deleteFlag} , #{sysFlag} , #{sort},#{comfmId},#{cascadeType})
+        <selectKey resultType="int" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <delete id="delete" parameterType="com.sungcor.baobiao.entity.FMFormField">
+        DELETE FROM FM_FIELD WHERE ID=#{id}
+    </delete>
+
+    <select id="search" parameterType="Integer" resultMap="fmFormField">
+        SELECT ff.*,fcf.DATASOURCE_ADDRESS FROM FM_FIELD ff
+                                                    INNER JOIN FM_COMMON_FIELD fcf ON fcf.ID=ff.COM_FM_ID
+        WHERE ff.AREA_ID=#{areaID} ORDER BY ff.SORT
+    </select>
+
+    <select id="listParentFieldList" parameterType="Integer" resultMap="fmFormField">
+        SELECT * FROM FM_FIELD WHERE AREA_ID=#{areaID} AND ( RENDER_TYPE='radio' OR RENDER_TYPE='checkbox' OR RENDER_TYPE='select' OR RENDER_TYPE='rpopwin' OR RENDER_TYPE='cpopwin' )
+    </select>
+
+    <select id="getSubField" parameterType="Integer" resultMap="fmFormField">
+        SELECT * FROM FM_FIELD WHERE PARENT_FIELD_ID=#{fieldID}
+    </select>
+
+    <select id="getSubFields" parameterType="hashMap" resultMap="fmFormField">
+        SELECT * FROM FM_FIELD WHERE 1=1 AND PARENT_FIELD_ID=#{fieldID}
+                                 AND CASCADE_TYPE=#{cascadeType}
+    </select>
+
+    <select id="getSysConSubField" parameterType="hashMap" resultMap="fmFormField">
+        SELECT * FROM CMDB_FIELD WHERE PARENT_FIELD_ID=#{fieldID}
+        <if test="cascadeType!=null">
+            AND CASCADE_TYPE=#{cascadeType}
+        </if>
+    </select>
+
+    <select id="getCmdbCiSubField" parameterType="hashMap" resultMap="fmFormField">
+        SELECT ID,NAME,RENDER_TYPE,DATASOURCE,PARENT_FIELD_ID,PARENT_FIELD_ATT,CASCADE_TYPE FROM CMDB_CATEGORY_ATTRIBUTE WHERE PARENT_FIELD_ID=#{fieldID}
+        <if test="cascadeType!=null">
+            AND CASCADE_TYPE=#{cascadeType}
+        </if>
+    </select>
+
+    <select id="getFMFormField" parameterType="Integer" resultMap="fmFormField">
+        SELECT ff.*,fcf.DATASOURCE_ADDRESS FROM FM_FIELD ff
+                                                    INNER JOIN FM_COMMON_FIELD fcf ON fcf.ID=ff.COM_FM_ID
+        WHERE ff.ID=#{fieldID}
+    </select>
+
+    <update id="update" parameterType="com.sungcor.baobiao.entity.FMFormField">
+        UPDATE FM_FIELD
+        <set>
+            ID=#{id},
+            <if test="areaID != null and areaID !=0">AREA_ID=#{areaID},</if>
+            <if test="name != null">NAME=#{name},</if>
+            <if test="label != null">LABEL=#{label},</if>
+            <if test="tooltip != null">TOOLTIP=#{tooltip} ,</if>
+            <if test="contentSize != null">SIZE=#{contentSize},</if>
+            <if test="defaultValue != null">DEFAULT_VALUE=#{defaultValue},</if>
+            <if test="isRequired != null">ISREQUIRED=#{isRequired},</if>
+            <if test="fullLine != null">FULL_LINE=#{fullLine},</if>
+            <if test="rows != null">ROWS=#{rows},</if>
+            <if test="dataSource != null">DATASOURCE=#{dataSource},</if>
+            <if test="format != null">FORMAT=#{format},</if>
+            <if test="parentID != null">PARENT_FIELD_ID=#{parentID},</if>
+            <if test="parentAtt != null">PARENT_FIELD_ATT=#{parentAtt},</if>
+            <if test="fieldIDs != null">FIELD_IDS=#{fieldIDs},</if>
+            <if test="evaRule != null">EVA_RULE=#{evaRule},</if>
+            <if test="deleteFlag != null">DEL_FLAG=#{deleteFlag},</if>
+            <if test="sysFlag != null">SYS_FLAG=#{sysFlag},</if>
+            <if test="sort != null"> SORT=#{sort},</if>
+            <if test="useFlag != null"> USE_FLAG=#{useFlag},</if>
+            CASCADE_TYPE=#{cascadeType}
+        </set>
+        WHERE ID=#{id}
+    </update>
+
+    <select id="getMaxFieldSortByAreaID" parameterType="Integer" resultType="Integer">
+        SELECT MAX(SORT) FROM FM_FIELD WHERE AREA_ID = #{areaID}
+    </select>
+
+    <update id="updateSortPre" parameterType="com.sungcor.baobiao.entity.FMFormField">
+        UPDATE FM_FIELD SET SORT = SORT+1  WHERE  AREA_ID = #{areaID} AND SORT >= #{sort}
+    </update>
+
+    <update id="updateSortNext" parameterType="com.sungcor.baobiao.entity.FMFormField">
+        UPDATE FM_FIELD SET SORT = SORT+1  WHERE  AREA_ID = #{areaID} AND SORT > #{sort}
+    </update>
+
+    <update id="updateAreaSortPre" parameterType="com.sungcor.baobiao.entity.FMFormArea">
+        UPDATE FM_AREA SET SORT = SORT+1  WHERE  FORM_VERSION_ID = #{versionID} AND SORT >= #{sort}
+    </update>
+
+    <update id="updateAreaSortNext" parameterType="com.sungcor.baobiao.entity.FMFormArea">
+        UPDATE FM_AREA SET SORT = SORT+1  WHERE  FORM_VERSION_ID = #{versionID} AND SORT > #{sort}
+    </update>
+
+    <select id="checkFieldUnique" parameterType="hashMap" resultType="int">
+        SELECT COUNT(1) FROM FM_FIELD FF
+        WHERE FF.NAME = #{name}
+          AND FF.AREA_ID IN (
+            SELECT FA2.ID from FM_AREA FA2 WHERE FA2.FORM_VERSION_ID =(SELECT FA.FORM_VERSION_ID FROM FM_AREA FA WHERE FA.ID = #{areaId}));
+    </select>
+
+
+    <select id="getVersionIDMapFieldID" parameterType="int" resultType="int">
+        SELECT FF.ID FROM FM_FIELD FF LEFT JOIN FM_AREA TA ON FF.AREA_ID= TA.ID
+        WHERE  FF.NAME='reporter' AND TA.FORM_VERSION_ID=#{versionID}
+    </select>
+    <update id="updateVersionIDByParentID" parameterType="hashMap">
+        UPDATE FM_FIELD SET PARENT_FIELD_ID=#{parentID}
+        WHERE AREA_ID IN (SELECT ID FROM FM_AREA FA WHERE FA.FORM_VERSION_ID=#{versionID})
+          and (NAME='reporterphone' OR  NAME='email' OR
+               NAME ='organise' OR  NAME='area' OR NAME='phone')
+    </update>
+
+    <select id="queryFormFields" parameterType="hashMap" resultMap="fmFormField">
+        SELECT ff.* FROM FM_FIELD ff
+        INNER JOIN (SELECT ID FROM FM_AREA WHERE FORM_VERSION_ID=#{versionID}
+        <if test="subForm==null">
+            AND (FORM_TYPE=0 OR FORM_TYPE IS NULL)
+        </if>
+        ) a ON a.ID=ff.AREA_ID
+        <if test="subForm!=null">
+            INNER JOIN (SELECT fa1.* FROM FM_AREA fa1 INNER JOIN FM_FIELD ff1 ON ff1.AREA_ID=fa1.ID WHERE ff1.NAME=#{name}) b ON b.ID=ff.AREA_ID
+        </if>
+        WHERE 1=1
+        <if test="type=='associated'">
+            AND SUBSTR(ff.DATASOURCE,1,12)='defineModule'
+            AND ff.RENDER_TYPE='rpopwin'
+        </if>
+        <if test="type=='cascade'">
+            AND ff.RENDER_TYPE IN('rpopwin','select')
+        </if>
+    </select>
+    <!--字段查询总数进行分页-->
+    <select id="getSortCount"  resultType="hashMap" parameterType="hashMap">
+        SELECT COUNT(*) AS syscount FROM ${table}  WHERE  AREA_ID=${id}
+    </select>
+    <!--字段查询数据集合-->
+    <select id="getsortList"  resultMap="fmFormField">
+        SELECT * FROM ${table}  WHERE  AREA_ID=${areaID} ORDER BY  SORT
+        <if test="beginRow !=null and pageRowCnt!=null">
+            LIMIT #{beginRow},#{pageRowCnt}
+        </if>
+    </select>
+    <!--向上移动-->
+    <select id="getUpward" parameterType="hashMap" resultMap="fmFormField">
+        <![CDATA[  SELECT * from FM_FIELD  WHERE AREA_ID=#{areaID} AND SORT <#{sort}]]>
+        <if test="number ==0">
+            ORDER BY SORT DESC   LIMIT 1
+        </if>
+    </select>
+    <!--向下移动-->
+    <select id="getDownward" parameterType="hashMap" resultMap="fmFormField">
+        SELECT * from FM_FIELD  WHERE AREA_ID=#{areaID} AND SORT >#{sort}
+        <if test="number ==1">
+            ORDER BY SORT LIMIT 1
+        </if>
+    </select>
+    <!--最上-->
+    <select id="getListUpward" parameterType="hashMap" resultMap="fmFormField">
+        <![CDATA[  SELECT * from FM_FIELD  WHERE AREA_ID=#{areaID} AND SORT <#{sort}]]>
+        <if test="number ==3">
+            ORDER BY SORT
+        </if>
+    </select>
+    <!--最下-->
+    <select id="getListDownward" parameterType="hashMap" resultMap="fmFormField">
+        SELECT * from FM_FIELD  WHERE AREA_ID=#{areaID} AND SORT >#{sort}
+        <if test="number ==2">
+            ORDER BY SORT DESC
+        </if>
+    </select>
+
+    <select id="getsysupordow" parameterType="hashMap" resultMap="fmFormField">
+        SELECT * from FM_FIELD  WHERE AREA_ID=#{areaID} AND SORT =#{sort}  ORDER BY  SORT LIMIT 1
+    </select>
+
+    <update id="updateSort" parameterType="com.sungcor.baobiao.entity.FMFormField">
+        UPDATE FM_FIELD SET SORT=#{sort}
+        WHERE AREA_ID=#{areaID} AND ID=#{id}
+    </update>
+
+    <!--向上移动-->
+    <select id="getAreaUpward" parameterType="hashMap" resultMap="fmFormArea">
+        <![CDATA[  SELECT * from FM_AREA  WHERE FORM_VERSION_ID=#{versionID} AND SORT <#{sort}]]>
+        <if test="number ==0">
+            ORDER BY SORT DESC   LIMIT 1
+        </if>
+    </select>
+    <!--向下移动-->
+    <select id="getAreaDownward" parameterType="hashMap" resultMap="fmFormArea">
+        SELECT * from FM_AREA  WHERE FORM_VERSION_ID=#{versionID} AND SORT >#{sort}
+        <if test="number ==1">
+            ORDER BY SORT LIMIT 1
+        </if>
+    </select>
+    <!--最上-->
+    <select id="getAreaListUpward" parameterType="hashMap" resultMap="fmFormArea">
+        <![CDATA[  SELECT * from FM_AREA  WHERE FORM_VERSION_ID=#{versionID} AND SORT <#{sort}]]>
+        <if test="number ==3">
+            ORDER BY SORT
+        </if>
+    </select>
+    <!--最下-->
+    <select id="getAreaListDownward" parameterType="hashMap" resultMap="fmFormArea">
+        SELECT * from FM_AREA  WHERE FORM_VERSION_ID=#{versionID} AND SORT >#{sort}
+        <if test="number ==2">
+            ORDER BY SORT DESC
+        </if>
+    </select>
+    <update id="updateAreaSort" parameterType="com.sungcor.baobiao.entity.FMFormArea">
+        UPDATE FM_AREA SET SORT=#{sort}
+        WHERE FORM_VERSION_ID=#{versionID} AND ID=#{id}
+    </update>
+
+    <select id="getsysAreaupordow" parameterType="hashMap" resultMap="fmFormArea">
+        SELECT * from FM_AREA  WHERE FORM_VERSION_ID=#{versionID} AND SORT =#{sort}  ORDER BY  SORT LIMIT 1
+    </select>
+
+
+</mapper>

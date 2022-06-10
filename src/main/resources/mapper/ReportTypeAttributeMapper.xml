@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.report.mapper.ReportTypeAttributeMapper">
+    <resultMap id="reportTypeAttributeMap" type="com.sungcor.baobiao.report.bean.ReportTypeAttributeBean">
+        <result property="id" column="ID" />
+        <result property="typeId" column="TYPE_ID" />
+        <result property="status" column="STATUS" />
+        <result property="attributeId" column="ATTRIBUTE_ID" />
+        <result property="attributeName" column="ATTRIBUTE_NAME" />
+        <result property="dataSource" column="DATA_SOURCE" />
+        <result property="fieldName" column="FIELD_NAME" />
+    </resultMap>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.sungcor.baobiao.report.bean.ReportTypeAttributeBean"  >
+        INSERT INTO REPORT_TYPE_ATTRIBUTE_T (TYPE_ID,STATUS,ATTRIBUTE_ID,ATTRIBUTE_NAME,DATA_SOURCE ,FIELD_NAME)
+        values (#{typeId},#{status},#{attributeId},#{attributeName},#{dataSource},#{fieldName})
+    </insert>
+
+    <select id="getReportTypeAttribute" parameterType="int" resultMap="reportTypeAttributeMap">
+        SELECT  * FROM  REPORT_TYPE_ATTRIBUTE_T   where  ID=#{id}
+    </select>
+    <select id="getReportTypeAttributeByFieldName" parameterType="String" resultMap="reportTypeAttributeMap">
+        SELECT  * FROM  REPORT_TYPE_ATTRIBUTE_T   where  FIELD_NAME=#{fieldName}
+    </select>
+    <delete id="delete" parameterType="int">
+        DELETE FROM REPORT_TYPE_ATTRIBUTE_T WHERE ID=#{id}
+
+    </delete>
+    <delete id="deleteFieldName" parameterType="String">
+        DELETE FROM REPORT_TYPE_ATTRIBUTE_T WHERE FIELD_NAME=#{fieldName}
+    </delete>
+    <update id="update" parameterType="com.sungcor.baobiao.report.bean.ReportTypeAttributeBean">
+        UPDATE    REPORT_TYPE_ATTRIBUTE_T   SET
+        <if test="typeId!=null" >
+            TYPE_ID=#{typeId},
+        </if>
+        <if test="status!=null" >
+            STATUS=#{status},
+        </if>
+        <if test="attributeId!=null" >
+            ATTRIBUTE_ID=#{attributeId},
+        </if>
+        <if test="attributeName!=null" >
+            ATTRIBUTE_NAME=#{attributeName},
+        </if>
+        <if test="dataSource!=null" >
+            DATA_SOURCE=#{dataSource},
+        </if>
+        <if test="fieldName!=null" >
+            FIELD_NAME=#{fieldName}
+        </if>
+        WHERE  ID=#{id}
+    </update>
+
+
+
+</mapper>

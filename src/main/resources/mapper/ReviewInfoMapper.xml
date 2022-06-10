@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.ReviewInfoMapper">
+
+    <resultMap id="reviewInfoBeanMap" type="com.sungcor.baobiao.entity.ReviewInfo">
+        <result property="id" column="ID" />
+        <result property="nodeHistoryID" column="NODE_HISTORY_ID" />
+        <result property="processInstanceID" column="PROCESS_INSTANCE_ID" />
+        <result property="optPersonID" column="OPT_PERSON_ID" />
+        <result property="optTime" column="OPT_TIME"   />
+        <result property="optReason" column="OPT_REASON" />
+        <result property="status" column="STATUS" />
+    </resultMap>
+
+    <select id="getRevieInfoByNhAndOp" parameterType="Map" resultMap="reviewInfoBeanMap">
+        SELECT *  FROM BPM_REVIEW_INFO  WHERE NODE_HISTORY_ID=#{nodeHistoryID} and OPT_PERSON_ID=#{optPersonID} AND OPT_TIME IS null
+    </select>
+
+    <select id="listRevieInfoByNh" parameterType="Map" resultMap="reviewInfoBeanMap">
+        SELECT *  FROM BPM_REVIEW_INFO  WHERE NODE_HISTORY_ID=#{nodeHistoryID}  AND OPT_TIME IS null
+    </select>
+
+    <select id="listRevieInfoByNh2" parameterType="Map" resultMap="reviewInfoBeanMap">
+        SELECT *  FROM BPM_REVIEW_INFO  WHERE NODE_HISTORY_ID=#{nodeHistoryId}
+        <if test="optTimeFlag!=null">
+            AND OPT_TIME IS NOT null
+        </if>
+        <if test="orderBy!=null">
+            GROUP BY OPT_PERSON_ID
+        </if>
+        ORDER BY OPT_TIME
+    </select>
+
+    <insert id="save" parameterType="com.sungcor.baobiao.entity.ReviewInfo" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BPM_REVIEW_INFO (NODE_HISTORY_ID, PROCESS_INSTANCE_ID, OPT_PERSON_ID , OPT_TIME , OPT_REASON , STATUS)
+        VALUES (#{nodeHistoryID}, #{processInstanceID}, #{optPersonID} , #{optTime} , #{optReason} ,#{status})
+    </insert>
+
+    <update id="update" parameterType="com.sungcor.baobiao.entity.ReviewInfo">
+        UPDATE BPM_REVIEW_INFO
+        <set>
+            <if test="nodeHistoryID != null">NODE_HISTORY_ID=#{nodeHistoryID},</if>
+            <if test="processInstanceID != null">PROCESS_INSTANCE_ID=#{processInstanceID},</if>
+            <if test="optPersonID != null">OPT_PERSON_ID=#{optPersonID},</if>
+            <if test="optTime != null">OPT_TIME=#{optTime},</if>
+            <if test="optReason != null">OPT_REASON=#{optReason},</if>
+            <if test="status != null">STATUS=#{status},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+
+
+</mapper>

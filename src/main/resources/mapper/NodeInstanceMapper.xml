@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.NodeInstanceMapper">
+
+    <resultMap id="nodeInstanceBeanMap" type="com.sungcor.baobiao.entity.NodeInstance">
+        <result property="id" column="ID" />
+        <result property="nodeDefinitionID" column="NODE_DEFINITION_ID" />
+        <result property="name" column="NAME" />
+        <result property="implementerID" column="IMPLEMENTER_ID" />
+        <result property="implementGroupID" column="IMPLEMENT_GROUP_ID"   />
+<!--        <result property="implementRoleType" column="IMPLEMENT_ROLE_TYPE" />-->
+        <result property="processInstanceID" column="PROCESS_INSTANCE_ID" />
+        <result property="forkJoin" column="FORK_JOIN" />
+        <result property="sourceForkNode" column="SOURCE_FORK_NODE" />
+        <result property="runFlag" column="RUN_FLAG" />
+        <result property="hangFlag" column="HANG_FLAG" />
+        <result property="hangModel" column="HANG_MODEL" />
+        <result property="auditModel" column="AUDIT_MODEL" />
+        <result property="includedDeal" column="INCLUDED_DEAL" />
+        <result property="dealFlag" column="DEAL_FLAG" />
+        <result property="dynamicRoleFlag" column="DYNAMIC_ROLE_FLAG" />
+        <result property="autoAssignFlag" column="AUTO_ASSIGN_FLAG" />
+        <result property="autoAssignPloy" column="AUTO_ASSIGN_PLOY" />
+        <result property="nodeUniqueID" column="UINQUE_ID" />
+        <result property="decisionFlag" column="DECISION_FLAG" />
+        <result property="timerFlag" column="TIMER_FLAG" />
+        <result property="hasLinkProcess" column="HASLINKPROCESS" />
+        <result property="hacFlag" column="HACFLAG" />
+        <result property="relatedCI" column="RELATEDCI_FLAG" />
+        <result property="roleByarea" column="ROLE_BY_AREA_FLAG" />
+        <result property="asideAuditorGroup" column="ASIDE_GROUP" />
+        <result property="performAllFlag" column="PERFORM_ALL_FLAG" />
+    </resultMap>
+
+    <select id="get" parameterType="int" resultMap="nodeInstanceBeanMap">
+        SELECT  *
+        FROM BPM_NODE_INSTANCE
+        WHERE ID=#{id}
+    </select>
+
+    <select id="getNodeInstanceByNameAndPID" parameterType="Map" resultMap="nodeInstanceBeanMap">
+        SELECT *  FROM BPM_NODE_INSTANCE  WHERE PROCESS_INSTANCE_ID=#{processInstanceID}  AND NAME=#{name}
+    </select>
+
+    <select id="getNodeInstanceByUniqueIDAndPID" parameterType="Map" resultMap="nodeInstanceBeanMap">
+        SELECT *  FROM BPM_NODE_INSTANCE  WHERE PROCESS_INSTANCE_ID=#{processInstanceID}  AND UINQUE_ID=#{uniqueID}
+    </select>
+
+
+    <insert id="save" parameterType="com.sungcor.baobiao.entity.NodeInstance" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO BPM_NODE_INSTANCE (NODE_DEFINITION_ID,NAME,IMPLEMENTER_ID,IMPLEMENT_GROUP_ID,IMPLEMENT_ROLE_TYPE,
+        PROCESS_INSTANCE_ID,FORK_JOIN,SOURCE_FORK_NODE,RUN_FLAG,HANG_FLAG,HANG_MODEL,AUDIT_MODEL,INCLUDED_DEAL,
+        DEAL_FLAG,DYNAMIC_ROLE_FLAG,AUTO_ASSIGN_FLAG,AUTO_ASSIGN_PLOY,UINQUE_ID,DECISION_FLAG,TIMER_FLAG,
+        HASLINKPROCESS,HACFLAG,RELATEDCI_FLAG,ROLE_BY_AREA_FLAG,ASIDE_GROUP)
+        VALUES (#{nodeDefinitionID},#{name},#{implementerID},#{implementGroupID},#{execRoleType},#{processInstanceID},#{forkJoin},
+        #{sourceForkNode},#{runFlag},#{hangFlag},#{hangModel},#{auditModel},#{includedDeal},#{dealFlag},#{dynamicRoleFlag},
+        #{autoAssignFlag},#{autoAssignPloy},#{nodeUniqueID},#{decisionFlag},#{timerFlag},#{hasLinkProcess},#{hacFlag},#{relatedCI},#{roleByarea},#{asideAuditorGroup})
+    </insert>
+    <insert id="saveBatch" parameterType="java.util.List">
+        INSERT INTO BPM_NODE_INSTANCE (NODE_DEFINITION_ID,NAME,IMPLEMENTER_ID,IMPLEMENT_GROUP_ID,IMPLEMENT_ROLE_TYPE,
+        PROCESS_INSTANCE_ID,FORK_JOIN,SOURCE_FORK_NODE,RUN_FLAG,HANG_FLAG,HANG_MODEL,AUDIT_MODEL,INCLUDED_DEAL,
+        DEAL_FLAG,DYNAMIC_ROLE_FLAG,AUTO_ASSIGN_FLAG,AUTO_ASSIGN_PLOY,UINQUE_ID,DECISION_FLAG,TIMER_FLAG,
+        HASLINKPROCESS,HACFLAG,RELATEDCI_FLAG,ROLE_BY_AREA_FLAG,ASIDE_GROUP,PERFORM_ALL_FLAG) VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.nodeDefinitionID},#{item.name},#{item.implementerID},#{item.implementGroupID},#{item.execRoleType},#{item.processInstanceID},#{item.forkJoin},
+            #{item.sourceForkNode},#{item.runFlag},#{item.hangFlag},#{item.hangModel},#{item.auditModel},#{item.includedDeal},#{item.dealFlag},#{item.dynamicRoleFlag},
+            #{item.autoAssignFlag},#{item.autoAssignPloy},#{item.nodeUniqueID},#{item.decisionFlag},#{item.timerFlag},#{item.hasLinkProcess},#{item.hacFlag},#{item.relatedCI},#{item.roleByarea},#{item.asideAuditorGroup},#{item.performAllFlag})
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.sungcor.baobiao.entity.NodeInstance">
+        UPDATE BPM_NODE_INSTANCE
+        <set>
+            <if test="implementerID != null">IMPLEMENTER_ID=#{implementerID},</if>
+            <if test="implementGroupID != null">IMPLEMENT_GROUP_ID=#{implementGroupID},</if>
+            <if test="runFlag != null">RUN_FLAG=#{runFlag},</if>
+            <if test="hangModel != null">HANG_MODEL=#{hangModel},</if>
+            <if test="auditModel != null">AUDIT_MODEL=#{auditModel},</if>
+            <if test="hangFlag != null">HANG_FLAG=#{hangFlag},</if>
+            <if test="asideAuditorGroup != null">ASIDE_GROUP=#{asideAuditorGroup},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <select id="listNodeInstnceByProInsID" parameterType="int" resultMap="nodeInstanceBeanMap">
+        SELECT  *
+        FROM BPM_NODE_INSTANCE
+        WHERE PROCESS_INSTANCE_ID=#{id}
+    </select>
+
+    <select id="listRunNodeInstnces" parameterType="int" resultMap="nodeInstanceBeanMap">
+        SELECT  *
+        FROM BPM_NODE_INSTANCE
+        WHERE RUN_FLAG= 1 ORDER BY ID DESC
+    </select>
+
+
+
+
+
+</mapper>

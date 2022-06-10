@@ -1,0 +1,643 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.UserMapper">
+
+    <resultMap id="userInfoBeanMap" type="com.sungcor.baobiao.entity.UserInfoBean">
+        <result property="userId" column="ID" />
+        <result property="userName" column="NAME" />
+        <result property="loginName" column="LOGINID" />
+        <result property="pwd" column="PASSWORD" />
+        <result property="email" column="EMAIL" />
+        <result property="phone" column="PHONE" />
+        <result property="active" column="ACTIVE" />
+        <result property="available" column="AVAILABLE" />
+        <result property="nickName" column="NICKNAME" />
+        <result property="face" column="FACE" />
+        <result property="portrait" column="PORTRAIT" />
+        <result property="createUser" column="CREATE_USER" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="modifyUser" column="MODIFY_USER" />
+        <result property="modifyTime" column="MODIFY_TIME" />
+        <result property="mobile" column="MOBILE" />
+        <result property="userCode" column="USERCODE" />
+        <result property="sex" column="SEX" />
+        <result property="birthday" column="BIRTHDAY" />
+        <result property="organizationId" column="ORGANIZATION_ID" />
+        <result property="organizationName" column="ORGANIZATION_NAME" />
+        <result property="isBoss" column="ISBOSS" />
+        <result property="remark" column="REMARK" />
+        <result property="photoPath" column="PHOTO_PATH" />
+        <result property="areaId" column="AREA_ID" />
+        <result property="areaName" column="AREANAME" />
+        <result property="wechatId" column="WECHATID" />
+        <result property="rtxId" column="RTXID" />
+    </resultMap>
+
+    <resultMap id="userInfoBeanMaps" extends="userInfoBeanMap" type="com.sungcor.baobiao.entity.UserInfoBean">
+        <result property="position" column="POSITION" />
+    </resultMap>
+
+    <delete id="deleteUserApp">
+        delete from SYS_USER_APPLICATION where USER_ID=#{userid} and APPLICATION_ID=#{appid}
+    </delete>
+
+    <select id="findByCode" parameterType="com.sungcor.baobiao.entity.UserInfoBean" resultMap="userInfoBeanMap">
+        select * from SYS_USER a
+        where 1=1
+        <if test="userCode != null">
+            AND a.USERCODE = #{userCode}
+        </if>
+        <if test="userId != null">
+            AND a.ID != #{userId}
+        </if>
+        <if test="available != null">
+            AND a.available = #{available}
+        </if>
+    </select>
+
+    <insert id="addUserApp" parameterType="hashMap">
+        insert into SYS_USER_APPLICATION(USER_ID , APPLICATION_ID)
+        values (#{userid} , #{appid} )
+    </insert>
+
+    <delete id="deleteUserArea" parameterType="hashMap">
+        DELETE FROM SYS_USER_AREA WHERE USER_ID= #{userid}<if test="areaid!=null">AND  AREA_ID=#{areaid}</if>
+    </delete>
+
+    <select id="checkDelete" resultType="hashMap">
+        SELECT a.USER_ID, a.AREA_ID FROM SYS_USER_AREA a  WHERE a.AREA_ID IN
+        <foreach item="item" index="index" collection="array"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="checkRegionDelete" resultType="hashMap">
+        SELECT a.USER_ID, a.REGION_ID FROM SYS_USER_REGION a  WHERE a.REGION_ID IN
+        <foreach item="item" index="index" collection="array"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <insert id="addUserArea" parameterType="hashMap">
+        insert into SYS_USER_AREA(USER_ID , AREA_ID)
+        values (#{userid} , #{areaid} )
+    </insert>
+
+    <select id="getUserApps" parameterType="hashMap" resultType="hashMap">
+        SELECT a.ID as "id"   , a.CODE  as "code" , a.NAME     as "name" ,
+        a.ORGANIZATION_ID  as "organizationId"   , a.TYPE   as "type"         , a.SERVICEPRODUCT_ID as "serviceProductId",
+        a.HOMEPAGE_URL     as "HomePageUrl"   , a.BASEINFO_IF_URL as "baseInfoIfUrl" , a.MOTYPE_IF_URL  as "motypeIfUrl"   ,
+        a.RELATIONSHIP_IF_URL as "relationshipIfUrl", a.DESCRIPTION as "description" , b.APPLICATION_ID as "status"
+        FROM SC_REG_APPLICATION a
+        LEFT JOIN SYS_USER_APPLICATION b ON b.APPLICATION_ID = a.ID
+        <if test="userid != null">
+            AND b.USER_ID=${userid}
+        </if>
+        WHERE a.STATUS='1'
+        <if test ="type != null">
+            AND a.TYPE=#{type}
+        </if>
+        <if test="orgs != null">
+            AND a.ORGANIZATION_ID IN
+            <foreach item="item"
+                     index="index"
+                     collection="orgs"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by a.TYPE
+    </select>
+
+    <select id="getUserArea" parameterType="hashMap" resultType="hashMap">
+        select a.ID as "id" , a.CODE as "code" , a.NAME as "name"
+        FROM SYS_AREA a
+        where exists( select 1 from SYS_USER_AREA b where a.ID = b.AREA_ID and b.USER_ID=#{userid,jdbcType=NUMERIC} )
+    </select>
+
+    <insert id="addUserSkill" parameterType="hashMap">
+        insert into SYS_USER_SKILL(USER_ID , SKILL_ID)
+        values ( #{userid} , #{skillid} )
+    </insert>
+
+    <delete id="delUserSkill" parameterType="hashMap">
+        delete from SYS_USER_SKILL where USER_ID=#{userid} and SKILL_ID=#{skillid}
+    </delete>
+
+    <select id="getUserSkills"   resultType="hashMap">
+        SELECT SS.NAME AS NAME, SS.ID AS ID
+        FROM SYS_SKILL SS
+        JOIN SYS_USER_SKILL SUS
+        ON SS.ID = SUS.SKILL_ID
+        AND SUS.USER_ID IN
+        <foreach item="item" index="index" collection="array"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+    <select id="getcheckUserSkills" parameterType="String"  resultType="hashMap">
+        SELECT SS.NAME AS NAME, SS.ID AS ID
+        FROM SYS_SKILL SS WHERE SS.ID NOT IN(SELECT SKILL_ID FROM SYS_USER_SKILL  WHERE USER_ID=#{userid})
+    </select>
+
+
+    <insert id="addUserRole" parameterType="hashMap">
+        insert into SYS_USER_ROLE(USER_ID  , ROLE_ID)
+        values ( #{userid} , #{roleid} )
+    </insert>
+
+    <delete id="delUserRole" parameterType="hashMap">
+        delete from SYS_USER_ROLE where USER_ID=#{userid} and ROLE_ID=#{roleid}
+    </delete>
+
+    <delete id="delAllUserRole" parameterType="hashMap">
+        delete from SYS_USER_ROLE where USER_ID=#{userid}
+    </delete>
+
+    <insert id="insertUser" parameterType="com.sungcor.baobiao.entity.UserInfoBean">
+        insert into SYS_USER(ID,NAME , LOGINID , PASSWORD ,
+        USERCODE , SEX , BIRTHDAY ,
+        ORGANIZATION_ID,  EMAIL ,
+        MOBILE,PHONE, ACTIVE , AVAILABLE,
+        CREATE_USER , CREATE_TIME,MODIFY_USER,MODIFY_TIME,POSITION ,PAUSE_ORDERS,AREA_ID,PHOTO_PATH,REMARK,DELETEFLAG,RTXID)
+        values(
+        SEQ_SYS_USER.NEXTVAL,#{userName,jdbcType=VARCHAR} , #{loginName,jdbcType=VARCHAR} , #{pwd,jdbcType=VARCHAR} ,
+        #{userCode,jdbcType=VARCHAR} , #{sex,jdbcType=VARCHAR} , #{birthday,jdbcType=TIMESTAMP},
+        #{orgarnizationId,jdbcType=NUMERIC} , #{email,jdbcType=VARCHAR} ,
+        #{mobile,jdbcType=VARCHAR},#{phone,jdbcType=VARCHAR} , #{active,jdbcType=VARCHAR} , #{available,jdbcType=VARCHAR},
+        #{createUser,jdbcType=VARCHAR} , #{createTime,jdbcType=TIMESTAMP} , #{modifyUser,jdbcType=VARCHAR} ,#{modifyTime,jdbcType=TIMESTAMP}, #{position,jdbcType=VARCHAR},'1'
+        ,#{areaId,jdbcType=NUMERIC},#{photoPath,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR},0,#{rtxId,jdbcType=VARCHAR})
+        <selectKey resultType="int" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID() AS userId
+        </selectKey>
+    </insert>
+
+    <update id="updateUser"  parameterType="com.sungcor.baobiao.entity.UserInfoBean">
+        UPDATE SYS_USER
+
+        <set>
+
+            <if test="userName != null">
+                NAME = #{userName},
+            </if>
+            <if test="pwd != null">
+                PASSWORD = #{pwd},
+            </if>
+            <if test="loginName != null">
+                LOGINID = #{loginName},
+            </if>
+            <if test="userCode != null">
+                USERCODE = #{userCode},
+            </if>
+            <if test="sex != null">
+                SEX = #{sex} ,
+
+            </if>
+            <if test="birthday !=null">
+                BIRTHDAY = #{birthday} ,
+
+            </if>
+            <if test="orgarnizationId !=null">
+                <if test="orgarnizationId !=0">
+                    <if test="orgarnizationId !=-1">
+                        ORGANIZATION_ID = #{orgarnizationId},
+                    </if>
+                </if>
+            </if>
+            <if test="email !=null">
+                EMAIL = #{email},
+
+            </if>
+            <if test="phone!=null">
+                PHONE = #{phone} ,
+            </if>
+            <if test="mobile !=null">
+                MOBILE= #{mobile} ,
+            </if>
+            <if test="active !=null">
+                ACTIVE = #{active},
+            </if>
+            <if test="available !=null">
+                AVAILABLE = #{available},
+
+            </if>
+            <if test="modifyUser!=null">
+                MODIFY_USER = #{modifyUser} ,
+            </if>
+            <if test="modifyTime!=null">
+                MODIFY_TIME= #{modifyTime},
+
+            </if>
+            <if test="position!=null">
+                POSITION= #{position},
+            </if>
+            <if test="remark!=null">
+                REMARK= #{remark},
+            </if>
+            <if test="photoPath!=null">
+                PHOTO_PATH= #{photoPath},
+            </if>
+            <if test="areaId!=null">
+                <if test="areaId!=0">
+                    AREA_ID= #{areaId},
+                </if>
+            </if>
+            <if test="rtxId!=null">
+                RTXID= #{rtxId},
+            </if>
+            <if test="deleteFlag!=null">
+                DELETEFLAG=#{deleteFlag},
+            </if>
+        </set>
+        WHERE ID = #{userId}
+    </update>
+
+    <!-- 取用户所能管理的组织信息 -->
+    <select id="queryOrg" parameterType="hashMap" resultType="hashMap">
+        SELECT ID as "id" , NAME as "name" , PARENT_ID as "pId" , GOVERNINGUNIT_ID as "haId"
+        FROM SYS_ORGANIZATION a
+    </select>
+
+    <select id="findByID" parameterType="int" resultMap="userInfoBeanMaps">
+        select a.ID               ,  a.NAME             ,  a.LOGINID          ,
+               a.PASSWORD         ,  a.USERCODE         ,  a.SEX              ,
+               a.BIRTHDAY         ,  a.ORGANIZATION_ID  ,
+               a.EMAIL            ,  a.MOBILE           ,  a.PHONE            ,
+               a.ACTIVE           ,  a.AVAILABLE        ,  a.NICKNAME         ,
+               a.FACE             ,  a.PORTRAIT         ,  a.CREATE_USER      ,a.WECHATID ,
+               a.CREATE_TIME      ,  a.MODIFY_USER      ,  a.MODIFY_TIME      , a.POSITION       ,
+               b.NAME as ORGANIZATION_NAME, a.REMARK remark , a.PHOTO_PATH photoPath,a.AREA_ID,c.NAME AREANAME,a.RTXID
+        from SYS_USER a
+                 left join SYS_ORGANIZATION b ON a.ORGANIZATION_ID=b.ID
+                 left join SYS_AREA c on a.AREA_ID=c.ID
+        where a.ID=#{0}
+    </select>
+
+    <select id="findByLoginID" parameterType="com.sungcor.baobiao.entity.UserInfoBean" resultMap="userInfoBeanMap">
+        select a.*
+        from SYS_USER a
+        where LOGINID=#{loginName} AND a.DELETEFLAG!=1
+    </select>
+
+<!--    &lt;!&ndash; 取用户所能管理的组织信息 &ndash;&gt;-->
+<!--    <select id="queryUserOrg" parameterType="hashMap" resultType="hashMap">-->
+<!--        SELECT ID as id , NAME as name , PARENT_ID as pid-->
+<!--        FROM SYS_ORGANIZATION a-->
+<!--    </select>-->
+
+    <update id="updatePwd" parameterType="hashMap">
+        UPDATE SYS_USER a SET a.PASSWORD=#{pwd} WHERE a.ID=#{userid}
+    </update>
+
+
+    <!-- resultMap="userInfoBeanMap" -->
+    <select id="queryUserList" parameterType="hashmap" resultType="hashMap"  >
+        SELECT *FROM (SELECT AROWNUM.*, ROWNUM N_M FROM (
+        select DISTINCT a.ID as "userId"             , a.NAME as "userName"          , a.LOGINID as "loginName" ,
+        a.PASSWORD as "pwd"          , a.EMAIL as "email"            , a.PHONE as  "phone",
+        a.ACTIVE as "active"         , a.AVAILABLE as "available"    , a.NICKNAME as "nickName",
+        a.FACE as "face"             , a.PORTRAIT as "portrait"      , a.CREATE_USER as "createUser",
+        a.CREATE_TIME as "createTime", a.MODIFY_USER as "modifyUser" , a.MODIFY_TIME as "modifyTime",
+        a.USERCODE as "userCode"     , a.SEX as "sex"                , a.BIRTHDAY as "birthday",
+        a.ORGANIZATION_ID as "orgarnizationId" , b.NAME as "orgarnizationName",a.MOBILE as "mobile",
+        a.AREA_ID as "areaID",         sa.NAME as "areaName",          sa.CODE as "areaCode",a.RTXID as rtxId
+        FROM SYS_USER a
+        LEFT JOIN SYS_ORGANIZATION b ON a.ORGANIZATION_ID=b.ID
+        LEFT JOIN SYS_AREA sa ON sa.ID=a.AREA_ID
+        <if test="regionId != null">
+            INNER JOIN SYS_USER_REGION sr ON sr.USER_ID=a.ID
+        </if>
+        <if test="roleId != null">
+            INNER JOIN SYS_USER_ROLE sur ON sur.USER_ID=a.ID
+        </if>
+        <if test="groupId != null">
+            INNER JOIN SYS_GROUP_USER sgu ON sgu.USER_ID=a.ID
+        </if>
+        WHERE 1=1
+        <if test="keyword != null">
+            AND (
+            a.NAME LIKE ('%'||'${keyword}'||'%' )
+            OR a.LOGINID LIKE ('%'||'${keyword}'||'%' )
+            OR a.USERCODE LIKE ('%'||'${keyword}'||'%' )
+            OR a.EMAIL LIKE ('%'||'${keyword}'||'%' )
+            OR a.MOBILE LIKE ('%'||'${keyword}'||'%' )
+            OR a.PHONE LIKE ('%'||'${keyword}'||'%' )
+            )
+        </if>
+        <if test="userName != ''">
+            AND a.NAME LIKE ('%'||'${userName}'||'%')
+        </if>
+        <if test="loginName !=''">
+            AND a.LOGINID  LIKE ('%'||'${loginName}'||'%')
+        </if>
+        <if test="regionId != null">
+            AND sr.REGION_ID=#{regionId}
+        </if>
+        <if test="roleId != null">
+            AND sur.ROLE_ID=#{roleId}
+        </if>
+        <if test="groupId != null">
+            AND sgu.GROUP_ID=#{groupId}
+        </if>
+        <if test="areaID != null">
+            AND a.AREA_ID=#{areaID}
+        </if>
+        <if test="available != -1">
+            AND a.AVAILABLE=#{available}
+        </if>
+        <if test="active != -1 and active!=null">
+            AND a.ACTIVE=#{active}
+        </if>
+        <if test="org != null">
+            AND a.ORGANIZATION_ID IN
+            <foreach item="item" index="index" collection="org" open="("
+                     separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="processInsID != null">
+            AND EXISTS ( SELECT bnh.ID FROM BPM_NODE_HISTORY bnh WHERE bnh.IMPLEMENTER_ID = a.ID  AND bnh.PROCESS_INSTANCE_ID = ${processInsID})
+        </if>
+        <if test="list != null">
+            AND a.ID NOT IN
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        and a.ID != -1
+        AND a.DELETEFLAG!=1
+        ORDER BY a.ID
+        ) AROWNUM WHERE ROWNUM  &lt;= (#{beginRow}+#{pageRowCnt})) BROWNUM WHERE BROWNUM.N_M &gt; #{beginRow}
+    </select>
+    <select id="getAllUser" resultType="hashMap">
+        select a.ID as id,a.NAME as name
+        from SYS_USER a
+                 left join SYS_ORGANIZATION b ON a.ORGANIZATION_ID=b.ID
+        where a.ID != -1 and a.ID !=-2 AND a.DELETEFLAG!=1
+    </select>
+    <select id="getAllUserBean" resultMap="userInfoBeanMap">
+        select a.*
+        from SYS_USER a
+                 left join SYS_ORGANIZATION b ON a.ORGANIZATION_ID=b.ID
+        where a.DELETEFLAG!=1
+    </select>
+    <select id="queryAllUserList" parameterType="hashmap" resultType="hashMap"  >
+        select a.ID as "userId"             , a.NAME as "userName"          , a.LOGINID as "loginName" ,
+               a.PASSWORD as "pwd"          , a.EMAIL as "email"            , a.PHONE as  "phone",
+               a.ACTIVE as "active"         , a.AVAILABLE as "available"    , a.NICKNAME as "nickName",
+               a.FACE as "face"             , a.PORTRAIT as "portrait"      , a.CREATE_USER as "createUser",
+               a.CREATE_TIME as "createTime", a.MODIFY_USER as "modifyUser" , a.MODIFY_TIME as "modifyTime",
+               a.USERCODE as "userCode"     , a.SEX as "sex"                , a.BIRTHDAY as "birthday",
+               a.ORGANIZATION_ID as "orgarnizationId" , b.NAME as "orgarnizationName",a.MOBILE as "mobile"
+        from SYS_USER a
+                 left join SYS_ORGANIZATION b ON a.ORGANIZATION_ID=b.ID
+        where a.ID != -1 AND a.DELETEFLAG!=1
+    </select>
+    <select id="queryAllUser" parameterType="hashmap" resultType="com.sungcor.baobiao.entity.UserInfoBean"  >
+        SELECT *  FROM(
+        SELECT a.*,ROWNUM as RN FROM
+        (
+        select a.ID as "userId"             , a.NAME as "userName"          , a.LOGINID as "loginName" ,
+        a.PASSWORD as "pwd"          , a.EMAIL as "email"            , a.PHONE as  "phone",
+        a.ACTIVE as "active"         , a.AVAILABLE as "available"    , a.NICKNAME as "nickName",
+        a.FACE as "face"             , a.PORTRAIT as "portrait"      , a.CREATE_USER as "createUser",
+        a.CREATE_TIME as "createTime", a.MODIFY_USER as "modifyUser" , a.MODIFY_TIME as "modifyTime",
+        a.USERCODE as "userCode"     , a.SEX as "sex"                , a.BIRTHDAY as "birthday",
+        a.ORGANIZATION_ID as "orgarnizationId" , b.NAME as "orgarnizationName",a.MOBILE as "mobile"
+        from SYS_USER a
+        left join SYS_ORGANIZATION b ON a.ORGANIZATION_ID=b.ID
+        where a.ID != -1 AND a.DELETEFLAG!=1
+        <if test="roleId != ''">
+            and a.id not in (select USER_ID from SYS_USER_ROLE where role_id = #{roleId})
+        </if>
+        <if test="userName != ''">
+            and a.NAME like ('%'||'${userName}'||'%')
+        </if>
+        <if test="loginName !=''">
+            and a.LOGINID  like ('%'||'${loginName}'||'%')
+        </if>
+        ) a
+        <if test="beginRow != null"><![CDATA[WHERE ROWNUM <= (#{beginRow}+#{pageRowCnt}) ]]></if>
+        ) <if test="pageRowCnt !=null">WHERE RN > #{beginRow}</if>
+    </select>
+    <select id="getUserCnt" parameterType="Map" resultType="hashMap">
+        SELECT COUNT(*) as "usercnt"
+        FROM SYS_USER a
+        <if test="regionId != null">
+            INNER JOIN SYS_USER_REGION sr ON sr.USER_ID=a.ID
+        </if>
+        <if test="roleId != null">
+            INNER JOIN SYS_USER_ROLE sur ON sur.USER_ID=a.ID
+        </if>
+        <if test="groupId != null">
+            INNER JOIN SYS_GROUP_USER sgu ON sgu.USER_ID=a.ID
+        </if>
+        WHERE 1=1
+        <if test="keyword != null">
+            AND (
+            a.NAME LIKE ('%'||'${keyword}'||'%' )
+            OR a.LOGINID LIKE ('%'||'${keyword}'||'%' )
+            OR a.USERCODE LIKE ('%'||'${keyword}'||'%' )
+            OR a.EMAIL LIKE ('%'||'${keyword}'||'%' )
+            OR a.MOBILE LIKE ('%'||'${keyword}'||'%' )
+            OR a.PHONE LIKE ('%'||'${keyword}'||'%' )
+            )
+        </if>
+        <if test="userName != ''">
+            AND a.NAME LIKE ('%'||'${userName}'||'%')
+        </if>
+        <if test="regionId != null">
+            AND sr.REGION_ID=#{regionId}
+        </if>
+        <if test="roleId != null">
+            AND sur.ROLE_ID=#{roleId}
+        </if>
+        <if test="groupId != null">
+            AND sgu.GROUP_ID=#{groupId}
+        </if>
+        <if test="areaID != null">
+            AND a.AREA_ID=#{areaID}
+        </if>
+        <if test="loginName !=''">
+            AND a.LOGINID  LIKE ('%'||'${loginName}'||'%')
+        </if>
+        <if test="available != -1">
+            AND a.AVAILABLE=#{available}
+        </if>
+        <if test="active != -1 and active!=null">
+            AND a.ACTIVE=#{active}
+        </if>
+        <if test="org != null">
+            AND a.ORGANIZATION_ID IN
+            <foreach item="item" index="index" collection="org" open="("
+                     separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="processInsID != null">
+            AND EXISTS ( SELECT bnh.ID FROM BPM_NODE_HISTORY bnh WHERE bnh.IMPLEMENTER_ID = a.ID  AND bnh.PROCESS_INSTANCE_ID = ${processInsID})
+        </if>
+        <if test="list != null">
+            AND a.ID NOT IN
+            <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        AND a.ID != -1
+        AND a.DELETEFLAG!=1
+    </select>
+    <delete id="deleteRoles"  parameterType="HashMap" >
+        delete from SYS_USER_ROLE where USER_ID=#{userid}
+    </delete>
+
+    <!--查询属于某个角色账户集合-->
+    <select id="getUserByRole" parameterType="Map" resultMap="userInfoBeanMap">
+        <if test="beginRow != null and pageRowCnt != null">
+            SELECT *FROM (SELECT AROWNUM.*, ROWNUM N_M FROM (
+        </if>
+        select
+        DISTINCT
+        T.ID,
+        T.NAME,
+        T.LOGINID,
+        T.PASSWORD,
+        T.USERCODE,
+        T.SEX,
+        T.BIRTHDAY,
+        T.ORGANIZATION_ID,
+        T.EMAIL,
+        T.MOBILE,
+        T.PHONE,
+        T.ACTIVE,
+        T.AVAILABLE,
+        T.NICKNAME,
+        T.FACE,
+        T.PORTRAIT,
+        T.CREATE_USER,
+        T.CREATE_TIME,
+        T.MODIFY_USER,
+        T.MODIFY_TIME
+        from SYS_USER T join SYS_USER_ROLE TT
+        ON T.id = TT.USER_ID
+        WHERE  1 =1 AND T.DELETEFLAG!=1
+        <if test="array != null">
+            and  TT.ROLE_ID in
+            <foreach item="item" index="index" collection="array" open="("
+                     separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+        <if test="username != null">  and T.NAME like '%' || '${username}' || '%'</if>
+        <if test="loginname != null ">  and T.LOGINID like '%' || '${loginname}' || '%'</if>
+        <if test="userid != null" > and T.id != #{userid} </if>
+        <if test="list != null">
+            and T.ORGANIZATION_ID IN
+            <foreach item="orgIds" index="index" collection="list" open="(" separator="," close=")">
+                #{orgIds}
+            </foreach>
+        </if>
+        <if test="beginRow != null and pageRowCnt != null">
+            ) AROWNUM WHERE ROWNUM  &lt;= (#{beginRow}+#{pageRowCnt})) BROWNUM WHERE BROWNUM.N_M &gt; #{beginRow}
+        </if>
+    </select>
+
+    <insert id="insertUserOrg" parameterType="Map">
+        insert into SYS_USER_ORGANISE(USER_ID , ORGANISE_ID )
+        values(
+                  #{userID} , #{organiseID}
+              )
+    </insert>
+    <select id="listUserOrg" parameterType="String" resultType="hashMap">
+        select *  from SYS_USER_ORGANISE where USER_ID = #{userID}
+    </select>
+
+    <delete id="deleteUserOrg"  parameterType="Map" >
+        delete from SYS_USER_ORGANISE where USER_ID=#{userID}
+        <if test="organiseID != null ">  and ORGANISE_ID = #{organiseID} </if>
+    </delete>
+
+    <select id="listOrg" parameterType="String" resultType="hashMap">
+        select T2.ID ,T2.NAME  from SYS_USER_ORGANISE T1,sys_organization T2 WHERE T1.ORGANISE_ID = T2.ID AND USER_ID = #{userID}
+    </select>
+
+    <select id="GetEamilById" parameterType="hashmap" resultMap="userInfoBeanMap">
+        SELECT EMAIL FROM SYS_USER WHERE ID IN
+        <foreach collection="ary" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="GetSmsById" parameterType="hashmap" resultMap="userInfoBeanMap">
+        SELECT MOBILE FROM SYS_USER WHERE ID IN
+        <foreach collection="ary" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updateDeleteFlag" parameterType="String">
+        UPDATE SYS_USER su SET su.DELETEFLAG=1 WHERE su.ID=#{userId}
+    </update>
+
+    <update id="updateDeleteFlagLing" parameterType="String">
+        UPDATE SYS_USER su SET su.DELETEFLAG=0 WHERE su.ID=#{userId}
+    </update>
+
+    <select id="getUserByRegion" parameterType="hashMap" resultMap="userInfoBeanMap">
+        SELECT * FROM(SELECT a.*,ROWNUM RN FROM(
+        SELECT su.ID,su.NAME,su.LOGINID,su.ORGANIZATION_ID,su.USERCODE FROM SYS_USER su
+        INNER JOIN SYS_USER_REGION sur ON sur.USER_ID=su.ID
+        INNER JOIN SYS_REGION sr ON sr.ID=sur.REGION_ID
+        WHERE 1=1
+        <if test="regionId!=null">
+            AND sr.ID=#{regionId}
+        </if>
+        <if test="userName!=null and userName!=''">
+            AND su.NAME LIKE ('%'||'${userName}'||'%')
+        </if>
+        <if test="loginName!=null and loginName!=''">
+            AND su.LOGINID LIKE ('%'||'${loginName}'||'%')
+        </if>
+        AND su.DELETEFLAG!=1
+        GROUP BY su.ID,su.NAME,su.LOGINID,su.ORGANIZATION_ID,su.USERCODE
+        ORDER BY ID)a)b
+        <if test="from!=null and from!=''">
+            WHERE RN BETWEEN #{from+1} AND #{end}
+        </if>
+    </select>
+
+    <select id="getUserForRegion" parameterType="hashMap" resultMap="userInfoBeanMap">
+        SELECT * FROM(SELECT a.*,ROWNUM RN FROM(
+        SELECT su.ID,su.NAME,su.LOGINID,su.ORGANIZATION_ID,su.USERCODE,su.EMAIL,su.MOBILE,su.PHONE FROM SYS_USER su WHERE 1=1
+        AND su.ID NOT IN(SELECT sur.USER_ID FROM SYS_USER_REGION sur
+        INNER JOIN SYS_REGION sr ON sr.ID=sur.REGION_ID WHERE sr.ID=#{regionId})
+        AND su.ID != -1
+        <if test="userName!=null and userName!=''">
+            AND su.NAME LIKE ('%'||'${userName}'||'%')
+        </if>
+        <if test="loginName!=null and loginName!=''">
+            AND su.LOGINID LIKE ('%'||'${loginName}'||'%')
+        </if>
+        AND su.DELETEFLAG!=1
+        ORDER BY su.ID)a)b
+        <if test="from!=null and from!=''">
+            WHERE RN BETWEEN #{from+1} AND #{end}
+        </if>
+    </select>
+
+    <select id="findByUserName" parameterType="String" resultMap="userInfoBeanMap">
+        select a.*
+        from SYS_USER a
+                 INNER JOIN SYS_USER_ROLE sur ON sur.USER_ID=a.ID
+        where NAME=#{userName} AND a.DELETEFLAG!=1 AND sur.ROLE_ID IN(24,25)
+    </select>
+
+    <select id="selectUserByDeleteFlag" parameterType="String" resultMap="userInfoBeanMap">
+        SELECT su.* FROM SYS_USER su WHERE su.LOGINID=#{loginName} AND su.DELETEFLAG=1
+    </select>
+
+</mapper>

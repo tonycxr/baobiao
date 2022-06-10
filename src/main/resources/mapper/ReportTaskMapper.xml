@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.report.mapper.ReportTaskMapper">
+    <resultMap id="reportModelMap" type="com.sungcor.baobiao.report.bean.ReportTaskBean">
+        <result property="id" column="ID" />
+        <result property="typeId" column="TYPE_ID" />
+        <result property="typeName" column="TYPE_NAME" />
+        <result property="groupId" column="GROUP_ID" />
+        <result property="groupName" column="GROUP_NAME" />
+        <result property="name" column="NAME" />
+        <result property="modelId" column="MODEL_ID" />
+        <result property="modelName" column="MODEL_NAME" />
+        <result property="cycle" column="CYCLE" />
+        <result property="countRange" column="COUNT_RANGE" />
+        <result property="countStartTime" column="COUNT_START_TIME" />
+        <result property="countEndTime" column="COUNT_END_TIME" />
+        <result property="taskType" column="TASK_TYPE" />
+        <result property="taskTypeName" column="TASK_TYPE_NAME" />
+        <result property="callTime" column="CALL_TIME" />
+        <result property="effectiveStartTime" column="EFFECTIVE_START_TIME" />
+        <result property="effectiveEndTime" column="EFFECTIVE_END_TIME" />
+        <result property="status" column="STATUS" />
+        <result property="createUser" column="CREATE_USER" />
+        <result property="createUserName" column="CREATE_USER_NAME" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="detail" column="DETAIL" />
+        <result property="task_day_date" column="TASK_DAY_DATE" />
+        <result property="task_day_time" column="TASK_DAY_TIME" />
+        <result property="task_week_date" column="TASK_WEEK_DATE" />
+        <result property="task_week_time" column="TASK_WEEK_TIME" />
+        <result property="task_month_time" column="TASK_MONTH_TIME" />
+        <result property="task_quarter_month" column="TASK_QUARTER_MONTH" />
+        <result property="task_quarter_time" column="TASK_QUARTER_TIME" />
+        <result property="task_year_time" column="TASK_YEAR_TIME" />
+        <result property="next_handle_time" column="NEXT_HANDLE_TIME" />
+    </resultMap>
+
+    <insert id="insertTask" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.sungcor.baobiao.report.bean.ReportTaskBean"  >
+        insert into REPORT_TASK_BASE_T (NAME,TYPE_ID,GROUP_ID,MODEL_ID,CYCLE,COUNT_RANGE,COUNT_START_TIME,COUNT_END_TIME , TASK_TYPE , CALL_TIME ,EFFECTIVE_START_TIME,EFFECTIVE_END_TIME,STATUS,CREATE_USER,CREATE_TIME, DETAIL,TASK_DAY_DATE,TASK_DAY_TIME,TASK_WEEK_DATE,TASK_WEEK_TIME,TASK_MONTH_TIME,TASK_QUARTER_MONTH,TASK_QUARTER_TIME,TASK_YEAR_TIME,NEXT_HANDLE_TIME)
+        values (#{name},#{typeId},#{groupId},#{modelId},#{cycle},#{countRange}, #{countStartTime} ,  #{countEndTime} , #{taskType} ,#{callTime} ,#{effectiveStartTime} ,#{effectiveEndTime} ,#{status} ,#{createUser},now(), #{detail},#{task_day_date},#{task_day_time},#{task_week_date},#{task_week_time},#{task_month_time},#{task_quarter_month},#{task_quarter_time},#{task_year_time},#{next_handle_time})
+    </insert>
+    <update id="updateTask" parameterType="com.sungcor.baobiao.report.bean.ReportTaskBean">
+        UPDATE REPORT_TASK_BASE_T SET NAME=#{name},TYPE_ID=#{typeId},GROUP_ID=#{groupId},MODEL_ID=#{modelId},
+                                      CYCLE=#{cycle},COUNT_RANGE=#{countRange}, COUNT_START_TIME=#{countStartTime},COUNT_END_TIME=#{countEndTime},
+                                      TASK_TYPE=#{taskType},CALL_TIME=#{callTime}, EFFECTIVE_START_TIME=#{effectiveStartTime},EFFECTIVE_END_TIME=#{effectiveEndTime},
+                                      STATUS=#{status}, DETAIL=#{detail},TASK_DAY_DATE=#{task_day_date},TASK_DAY_TIME=#{task_day_time},
+                                      TASK_WEEK_DATE=#{task_week_date},TASK_WEEK_TIME=#{task_week_time},TASK_MONTH_TIME=#{task_month_time},
+                                      TASK_QUARTER_MONTH=#{task_quarter_month}, TASK_QUARTER_TIME=#{task_quarter_time},TASK_YEAR_TIME=#{task_year_time},NEXT_HANDLE_TIME=#{next_handle_time}
+        WHERE ID= #{id}
+    </update>
+    <select id="findListCountByMap" parameterType="hashMap" resultType="int">
+        SELECT COUNT(1) FROM REPORT_TASK_BASE_T T1
+        LEFT JOIN REPORT_GROUP_T T2 ON T2.ID = T1.GROUP_ID
+        LEFT JOIN REPORT_TYPE_T T3 ON T3.ID = T1.TYPE_ID
+        LEFT JOIN REPORT_MODEL_T T5 ON T5.ID = T1.MODEL_ID
+        LEFT JOIN SYS_USER T4 ON T4.ID = T1.CREATE_USER
+        WHERE 1=1
+        <if test="keyWorld != null">
+            AND CONCAT(T1.NAME,',',T5.NAME,',',T4.NAME) LIKE CONCAT('%',#{keyWorld},'%')
+        </if>
+        <if test="reportType != null"> AND T1.TYPE_ID=#{reportType}</if>
+        <if test="reportGroup != null"> AND T1.GROUP_ID=#{reportGroup}</if>
+        <if test="taskType != null"> AND T1.TASK_TYPE=#{taskType}</if>
+        <if test="create_user != null"> AND T1.CREATE_USER=#{create_user}</if>
+    </select>
+    <select id="findListByMap" parameterType="hashMap" resultMap="reportModelMap">
+        SELECT T6.NAME TASK_TYPE_NAME,T1.NAME,T1.STATUS,T1.TASK_TYPE,T1.CALL_TIME,T2.NAME GROUP_NAME,T3.NAME TYPE_NAME,T1.ID,T5.NAME MODEL_NAME,
+        T4.NAME CREATE_USER_NAME,T1.CREATE_TIME,CYCLE,TASK_DAY_TIME,TASK_WEEK_DATE,TASK_WEEK_TIME,TASK_MONTH_TIME,TASK_QUARTER_MONTH,TASK_QUARTER_TIME,TASK_YEAR_TIME
+        FROM REPORT_TASK_BASE_T T1
+        LEFT JOIN REPORT_GROUP_T T2 ON T2.ID = T1.GROUP_ID
+        LEFT JOIN REPORT_TYPE_T T3 ON T3.ID = T1.TYPE_ID
+        LEFT JOIN REPORT_MODEL_T T5 ON T5.ID = T1.MODEL_ID
+        LEFT JOIN SYS_USER T4 ON T4.ID = T1.CREATE_USER
+        LEFT JOIN SYS_DICT_ITEM T6 ON T1.TASK_TYPE=T6.ID
+        WHERE 1=1
+        <if test="keyWorld != null">
+            AND CONCAT(T1.NAME,',',T5.NAME,',',T4.NAME) LIKE CONCAT('%',#{keyWorld},'%')
+        </if>
+        <if test="reportType != null"> AND T1.TYPE_ID=#{reportType}</if>
+        <if test="reportGroup != null"> AND T1.GROUP_ID=#{reportGroup}</if>
+        <if test="taskType != null"> AND T1.TASK_TYPE=#{taskType}</if>
+        <if test="create_user != null"> AND T1.CREATE_USER=#{create_user}</if>
+        LIMIT #{beginRow},#{pageRowCnt}
+    </select>
+    <delete id="deleteTask" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_TASK_BASE_T WHERE ID IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <update id="startTask" parameterType="java.util.Arrays">
+        UPDATE REPORT_TASK_BASE_T SET STATUS='1' WHERE ID IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="startOrStop" parameterType="hashMap">
+        UPDATE REPORT_TASK_BASE_T SET STATUS=#{status} WHERE ID IN
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <select id="findById" parameterType="int" resultMap="reportModelMap">
+        SELECT * FROM REPORT_TASK_BASE_T WHERE ID = #{id}
+    </select>
+
+    <insert id="addOrUpdateField" parameterType="java.util.List">
+        INSERT INTO REPORT_TASK_QUERYSETTING_T (ID,TASK_ID,NAME,VALUE,DATA_SOURCE,TEXT) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (default,#{item.taskId},#{item.name},#{item.value},#{item.dataSource},#{item.text})
+        </foreach>
+    </insert>
+
+    <select id="findTaskModelQuery" parameterType="String" resultType="hashMap">
+        SELECT DATA_SOURCE source,NAME fieldName,VALUE fieldValue,'=' relation  FROM REPORT_TASK_QUERYSETTING_T WHERE TASK_ID = #{taskId}
+    </select>
+
+    <delete id="deleteQuerySetting" parameterType="string">
+        DELETE FROM REPORT_TASK_QUERYSETTING_T WHERE TASK_ID = #{id}
+    </delete>
+
+    <select id="initValue" parameterType="string" resultType="hashMap">
+        SELECT DATA_SOURCE as dataSource,ID as id,NAME as name,VALUE as value,TEXT as text,
+          TASK_ID as taskId FROM REPORT_TASK_QUERYSETTING_T WHERE TASK_ID = #{id}
+    </select>
+
+    <delete id="deleteAllQuerySetting" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_TASK_QUERYSETTING_T WHERE TASK_ID IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findListByModelIds" parameterType="java.util.Arrays" resultMap="reportModelMap">
+        SELECT ID,MODEL_ID FROM REPORT_TASK_BASE_T WHERE MODEL_ID IN
+        <foreach collection="array" item="item" index="index" open="(" close=")" separator="," >
+            #{item}
+        </foreach>
+    </select>
+    <select id="findApplyUserListCountByMap" parameterType="hashMap" resultType="int">
+        SELECT COUNT(1)
+        FROM  SYS_USER T2
+        WHERE 1=1 AND T2.AVAILABLE='1'
+        <!-- <if test="modelId != null"> AND T1.MODEL_ID=#{modelId}</if>-->
+        <if test="userName != null">
+            AND T2.NAME LIKE   CONCAT('%','${userName}','%' )
+        </if>
+        <if test="loginName != null">
+            AND T2.LOGINID LIKE   CONCAT('%','${loginName}','%' )
+        </if>
+    </select>
+    <select id="findApplyUserListByMap" parameterType="hashMap" resultType="hashMap">
+        SELECT T2.ID as userId,T2.NAME as userName,T2.LOGINID as loginName ,T2.USERCODE as userCode,T2.EMAIL as email
+        FROM  SYS_USER T2
+        WHERE 1=1 AND T2.AVAILABLE='1'
+        <!--  <if test="modelId != null"> AND T1.MODEL_ID=#{modelId}</if>-->
+        <if test="userName != null">
+            AND T2.NAME LIKE   CONCAT('%','${userName}','%' )
+        </if>
+        <if test="loginName != null">
+            AND T2.LOGINID LIKE   CONCAT('%','${loginName}','%' )
+        </if>
+        LIMIT #{beginRow},#{pageRowCnt}
+    </select>
+    <select id="queryTimingByTaskType" parameterType="hashMap" resultType="hashMap">
+        SELECT ID AS id FROM  REPORT_TASK_BASE_T a WHERE a.NEXT_HANDLE_TIME LIKE  CONCAT('%','${theTime}','%' )
+    </select>
+
+</mapper>

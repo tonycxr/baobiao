@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.FMFormVersionMapper">
+
+    <resultMap id="fmFormVersion" type="com.sungcor.baobiao.entity.FMFormVersion">
+        <result property="id" column="ID" />
+        <result property="formID" column="FORM_ID" />
+        <result property="version" column="VERSION" />
+        <result property="vaildFlag" column="ISVAILD" />
+        <result property="parentFormVersionID" column="PARENT_FORM_VERSION_ID" />
+        <result property="lockFlag" column="ISLOCK" />
+        <result property="locker" column="LOCK_USER" />
+        <result property="publishFlag" column="ISPUBLISH" />
+        <result property="createUser" column="CREATE_USER" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="modifyUser" column="MODIFY_USER" />
+        <result property="modifyTime" column="MODIFY_TIME" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.sungcor.baobiao.entity.FMFormVersion" >
+        INSERT INTO FM_FORM_VERSION (FORM_ID, VERSION, ISVAILD , CREATE_USER , CREATE_TIME , MODIFY_USER , MODIFY_TIME,
+        PARENT_FORM_VERSION_ID,ISLOCK,LOCK_USER,ISPUBLISH)
+        VALUES (#{formID}, #{version}, #{vaildFlag} , #{createUser} , #{createTime} , #{modifyUser} , #{modifyTime},
+        #{parentFormVersionID}, #{lockFlag}, #{locker} , #{publishFlag})
+        <selectKey resultType="int" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <delete id="delete" parameterType="com.sungcor.baobiao.entity.FMFormVersion">
+        DELETE FROM FM_FORM_VERSION WHERE ID=#{id}
+    </delete>
+
+    <select id="search" parameterType="Map" resultMap="fmFormVersion">
+        SELECT * FROM FM_FORM_VERSION WHERE FORM_ID=#{formID} ORDER BY VERSION DESC limit #{beginRow},#{pageRowCnt}
+    </select>
+
+    <select id="getVersionByFormID" parameterType="Integer" resultMap="fmFormVersion">
+        SELECT * FROM FM_FORM_VERSION WHERE FORM_ID=#{formID} ORDER BY VERSION DESC
+    </select>
+
+    <select id="searchSubVersion" parameterType="Integer" resultMap="fmFormVersion">
+        SELECT * FROM FM_FORM_VERSION WHERE PARENT_FORM_VERSION_ID=#{versionID}
+    </select>
+
+    <select id="getFMFormVersion" parameterType="Integer" resultMap="fmFormVersion">
+        SELECT * FROM FM_FORM_VERSION WHERE ID=#{id}
+    </select>
+
+    <update id="update" parameterType="com.sungcor.baobiao.entity.FMFormVersion">
+        UPDATE FM_FORM_VERSION SET FORM_ID=#{formID},VERSION=#{version},ISVAILD=#{vaildFlag},MODIFY_USER=#{modifyUser},MODIFY_TIME=#{modifyTime},
+                                   PARENT_FORM_VERSION_ID=#{parentFormVersionID},ISLOCK=#{lockFlag},LOCK_USER=#{locker},ISPUBLISH=#{publishFlag}
+        WHERE ID=#{id}
+    </update>
+
+    <select id="getFormVersionCount" parameterType="Map" resultType="hashMap">
+        SELECT COUNT(*) as versionCount FROM FM_FORM_VERSION WHERE FORM_ID=#{formID}
+    </select>
+
+</mapper>

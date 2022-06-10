@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.mapper.CaseFormDataMapper">
+
+    <resultMap id="caseFormData" type="com.sungcor.baobiao.entity.CaseFormData">
+        <result property="id" column="ID" />
+        <result property="processInstanceID" column="PROCESS_INSTANCE_ID" />
+        <result property="formVersionId" column="FORM_VERSION_ID" />
+        <result property="fieldId" column="FIELD_ID" />
+        <result property="fieldName" column="FIELD_NAME"   />
+        <result property="fieldLabel" column="FIELD_LABEL" />
+        <result property="fieldType" column="FIELD_TYPE" />
+        <result property="fieldValue" column="FIELD_VALUE" />
+        <result property="fieldDataSource" column="FIELD_DATASOURCE" />
+        <result property="formType" column="FORM_TYPE" />
+        <result property="subFormObjId" column="SUB_FORM_OBJ_ID" />
+    </resultMap>
+
+
+
+    <select id="get" parameterType="int" resultMap="caseFormData">
+        SELECT  * FROM CASE_FORM_DATA
+        WHERE PROCESS_INSTANCE_ID=#{processInstanceID}
+    </select>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO CASE_FORM_DATA (PROCESS_INSTANCE_ID, FORM_VERSION_ID, FIELD_ID ,  FIELD_NAME , FIELD_LABEL ,
+        FIELD_TYPE,FIELD_VALUE,FIELD_DATASOURCE)
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            ( #{item.processInstanceID}, #{item.formVersionId}, #{item.fieldId},
+            #{item.fieldName}, #{item.fieldLabel},
+            #{item.fieldType}, #{item.fieldValue},
+            #{item.fieldDataSource})
+        </foreach>
+    </insert>
+    <insert id="insert" parameterType="com.sungcor.baobiao.entity.CaseFormData">
+        INSERT INTO CASE_FORM_DATA (PROCESS_INSTANCE_ID, FORM_VERSION_ID, FIELD_ID ,  FIELD_NAME , FIELD_LABEL ,
+        FIELD_TYPE,FIELD_VALUE,FIELD_DATASOURCE,FORM_TYPE,SUB_FORM_OBJ_ID,AREA_ID)
+        VALUES (
+        #{processInstanceID},
+        #{formVersionId},
+        #{fieldId},
+        #{fieldName},
+        #{fieldLabel},
+        #{fieldType},
+        #{fieldValue},
+        #{fieldDataSource},
+        #{formType},
+        #{subFormObjId},
+        #{areaID}
+        )
+    </insert>
+    <insert id="insertListSubForm" parameterType="java.util.List">
+        INSERT INTO CASE_FORM_DATA (PROCESS_INSTANCE_ID, FORM_VERSION_ID, FIELD_ID ,  FIELD_NAME , FIELD_LABEL ,
+        FIELD_TYPE,FIELD_VALUE,FIELD_DATASOURCE,FORM_TYPE,SUB_FORM_OBJ_ID,AREA_ID)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.processInstanceID},
+            #{item.formVersionId},
+            #{item.fieldId},
+            #{item.fieldName},
+            #{item.fieldLabel},
+            #{item.fieldType},
+            #{item.fieldValue},
+            #{item.fieldDataSource},
+            #{item.formType},
+            #{item.subFormObjId},
+            #{item.areaID}
+            )
+        </foreach>
+
+    </insert>
+    <update id="update" parameterType="com.sungcor.baobiao.entity.CaseFormData">
+        UPDATE CASE_FORM_DATA SET FIELD_VALUE=#{fieldValue}
+        WHERE PROCESS_INSTANCE_ID = #{processInstanceID} AND  FIELD_NAME=#{fieldName}
+    </update>
+
+    <update id="updateByObjID" parameterType="com.sungcor.baobiao.entity.CaseFormData">
+        UPDATE CASE_FORM_DATA SET FIELD_VALUE=#{fieldValue}
+        WHERE SUB_FORM_OBJ_ID=#{subFormObjId} AND FIELD_NAME=#{fieldName}
+    </update>
+
+    <select id="delete" parameterType="Integer" >
+        DELETE FROM CASE_FORM_DATA WHERE PROCESS_INSTANCE_ID = #{processInstanceID}
+    </select>
+
+    <select id="getCaseFormDataByName" parameterType="hashMap" resultMap="caseFormData">
+        SELECT * FROM CASE_FORM_DATA WHERE 1=1
+        AND PROCESS_INSTANCE_ID=#{processInstanceID}
+        AND FIELD_NAME=#{fieldName}
+    </select>
+
+    <select id="getCaseFormSubDataByName" parameterType="hashMap" resultMap="caseFormData">
+        SELECT FIELD_VALUE FROM CASE_SUB_FORM_DATA WHERE 1=1
+        AND PROCESS_INSTANCE_ID=#{processInstanceID}
+        AND FIELD_NAME=#{fieldName}
+        <if test="subFormObjID!=null">
+            AND SUB_FORM_OBJ_ID=#{subFormObjID}
+        </if>
+    </select>
+
+    <select id="list" parameterType="map" resultMap="caseFormData">
+        SELECT * FROM  CASE_FORM_DATA WHERE 1=1
+        <if test="processInstanceID!=null">
+            AND PROCESS_INSTANCE_ID=#{processInstanceID}
+        </if>
+        <if test="formVersionId!=null">
+            AND FORM_VERSION_ID=#{formVersionId}
+        </if>
+        <if test="areaID!=null">
+            AND AREA_ID=#{areaID}
+        </if>
+    </select>
+
+    <select id="deleteByObjID" parameterType="Integer" >
+        DELETE FROM CASE_FORM_DATA WHERE SUB_FORM_OBJ_ID=#{subFormObjId}
+    </select>
+
+    <select id="getByObjID" parameterType="Integer" resultMap="caseFormData">
+        SELECT * FROM  CASE_FORM_DATA WHERE SUB_FORM_OBJ_ID=#{subFormObjId}
+    </select>
+
+    <update id="updateTempSN" parameterType="hashMap">
+        UPDATE CASE_FORM_DATA SET PROCESS_INSTANCE_ID=#{processInstanceID} WHERE PROCESS_INSTANCE_ID=#{tempSN}
+    </update>
+
+<!--    <select id="querySysSubByCase" parameterType="hashMap" resultMap="caseFormData">-->
+<!--        SELECT DISTINCT cfd.PROCESS_INSTANCE_ID,cfd.FIELD_NAME,cfd.FIELD_TYPE,cfd.FIELD_DATASOURCE,cfd.FIELD_LABEL-->
+<!--        <if test="valueSql!=null">-->
+<!--            ${valueSql}-->
+<!--        </if>-->
+<!--        FROM CASE_FORM_DATA cfd-->
+<!--        INNER JOIN BPM_PROCESS_INSTANCE bpi ON bpi.ID=cfd.PROCESS_INSTANCE_ID-->
+<!--        <if test="condition!=null">-->
+<!--            ${condition}-->
+<!--        </if>-->
+<!--        <if test="sql!=null">-->
+<!--            ${sql}-->
+<!--        </if>-->
+<!--        WHERE 1=1-->
+<!--        <if test="processInstanceId!=null">-->
+<!--            AND cfd.PROCESS_INSTANCE_ID=#{processInstanceId}-->
+<!--        </if>-->
+<!--        <if test="fieldNames!=null">-->
+<!--            AND cfd.FIELD_NAME IN-->
+<!--            <foreach collection="fieldNames" item="item" index="index" open="(" separator="," close=")">-->
+<!--                #{item.name}-->
+<!--            </foreach>-->
+<!--        </if>-->
+<!--    </select>-->
+
+<!--    <select id="querySysSubCount" parameterType="hashMap" resultType="hashMap">-->
+<!--        SELECT DISTINCT cfd.PROCESS_INSTANCE_ID FROM CASE_FORM_DATA cfd-->
+<!--        INNER JOIN BPM_PROCESS_INSTANCE bpi ON bpi.ID=cfd.PROCESS_INSTANCE_ID-->
+<!--        <if test="condition!=null">-->
+<!--            ${condition}-->
+<!--        </if>-->
+<!--        <if test="sql!=null">-->
+<!--            ${sql}-->
+<!--        </if>-->
+<!--        WHERE 1=1-->
+<!--        ORDER BY cfd.PROCESS_INSTANCE_ID DESC-->
+<!--        <if test="from!=null">-->
+<!--            LIMIT ${from},${length}-->
+<!--        </if>-->
+<!--    </select>-->
+
+</mapper>

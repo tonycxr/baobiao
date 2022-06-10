@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sungcor.baobiao.report.mapper.ReportQuerySettingMapper">
+
+    <select id="getAll" parameterType="hashMap"
+            resultType="com.sungcor.baobiao.report.bean.ReportFieldBean">
+        SELECT ID,NAME,CODE,RENDERTYPE,DATASOURCE,TYPE_ID as typeId,DEFAULT_VALUE as defaultValue,LABEL
+        FROM REPORT_FIELD_T a WHERE 1=1
+        <if test="keyWorld != null">
+            AND A.TYPE_ID = #{keyWorld}
+        </if>
+        <if test="modelId != null">
+            AND a.ID NOT IN
+            (SELECT FIELD_ID FROM REPORT_FIELD_SETTING_T WHERE ID = #{modelId})
+        </if>
+        <if test="reportType==8"> AND REPORT_TYPE = #{reportType}</if>
+        <if test="reportType!=8"> AND REPORT_TYPE IS NULL</if>
+    </select>
+
+    <select id="getAll2" parameterType="hashMap"
+            resultType="java.util.List">
+        SELECT ID,NAME,CODE,RENDERTYPE,DATASOURCE,TYPE_ID as typeId,DEFAULT_VALUE as defaultValue,LABEL
+        FROM REPORT_FIELD_T a WHERE 1=1
+        <if test="keyWorld != null">
+            AND A.TYPE_ID = #{keyWorld}
+        </if>
+        <if test="modelId != null">
+            AND a.ID IN
+            (SELECT FIELD_ID FROM REPORT_FIELD_SETTING_T WHERE ID = #{modelId})
+        </if>
+    </select>
+
+    <select id="findById" parameterType="Integer"
+            resultType="com.sungcor.baobiao.report.bean.ReportQuerySettingBean">
+        SELECT * FROM REPORT_QUERY_SETTING_T WHERE ID=#{id}
+    </select>
+
+    <select id="findByModelId" parameterType="string"
+            resultType="com.sungcor.baobiao.report.bean.ReportQuerySettingBean">
+        SELECT ID,TYPE_ID as typeId,MODEL_ID as modelId,DATE_PURVIEW as datePurview,
+               ISENABLE,BEGIN_DATE as beginDate ,END_DATE as endDate,
+            SIZE,SIZE_UNIT as sizeUnit,CREATE_USER as createUser,
+            CREATE_TIME as createTime,MODIFY_USER as modifyUser,MODIFY_TIME  as modifyTime
+        FROM REPORT_QUERY_SETTING_T WHERE MODEL_ID = #{modelId}
+    </select>
+
+    <insert id="addQuerySetting" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.sungcor.baobiao.report.bean.ReportQuerySettingBean">
+        INSERT INTO REPORT_QUERY_SETTING_T (DATE_PURVIEW,BEGIN_DATE,END_DATE,ISENABLE,SIZE,SIZE_UNIT,
+                                            CREATE_USER , CREATE_TIME , MODIFY_USER , MODIFY_TIME,MODEL_ID,TYPE_ID)
+        values (#{datePurview},#{beginDate},#{endDate},#{isEnable},#{size},#{sizeUnit},
+                #{createUser} , now() , #{modifyUser} , now(),#{modelId},#{typeId})
+    </insert>
+    <update id="updateQuerySetting"
+            parameterType="com.sungcor.baobiao.report.bean.ReportQuerySettingBean">
+        UPDATE REPORT_QUERY_SETTING_T SET DATE_PURVIEW=#{datePurview},BEGIN_DATE=#{beginDate},
+                                          END_DATE=#{endDate},ISENABLE=#{isEnable},SIZE=#{size},SIZE_UNIT=#{sizeUnit},
+                                          MODIFY_USER=#{modifyUser} , MODIFY_TIME= now(),MODEL_ID=#{modelId},TYPE_ID=#{typeId} WHERE ID = #{id}
+    </update>
+    <delete id="deleteField2Setting" parameterType="java.util.List">
+        DELETE FROM REPORT_FIELD_SETTING_T WHERE
+        <foreach collection="list" item="item" index="index" separator="or">
+            (ID = #{item.id} AND FIELD_ID = #{item.fieldId})
+        </foreach>
+    </delete>
+
+    <insert id="addField2Setting" parameterType="java.util.List">
+        INSERT INTO REPORT_FIELD_SETTING_T (ID,FIELD_ID)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.fieldId})
+        </foreach>
+    </insert>
+    <insert id="copyDateSetting" parameterType="hashMap">
+        INSERT INTO REPORT_QUERY_SETTING_T (DATE_PURVIEW,BEGIN_DATE,END_DATE,ISENABLE,SIZE,SIZE_UNIT,
+                                            CREATE_USER , CREATE_TIME , MODIFY_USER , MODIFY_TIME,MODEL_ID,TYPE_ID)
+        select DATE_PURVIEW,BEGIN_DATE,END_DATE,ISENABLE,SIZE,SIZE_UNIT,
+            CREATE_USER , CREATE_TIME , MODIFY_USER , MODIFY_TIME,#{newId},TYPE_ID from REPORT_QUERY_SETTING_T where MODEL_ID = #{oldId}
+    </insert>
+
+    <insert id="copyQuerySetting" parameterType="hashMap">
+        INSERT INTO REPORT_FIELD_SETTING_T (ID,FIELD_ID)
+        select #{newId},FIELD_ID from REPORT_FIELD_SETTING_T where ID = #{oldId}
+    </insert>
+
+    <select id="getQueryCondition" parameterType="string"
+            resultType="com.sungcor.baobiao.report.bean.ReportFieldBean">
+        SELECT ID,NAME,CODE,RENDERTYPE,DATASOURCE,TYPE_ID as typeId,DEFAULT_VALUE as defaultValue,
+               LABEL,QUERY_DATA_SOURCE as querySource FROM REPORT_FIELD_T WHERE ID IN
+                                                                                (SELECT FIELD_ID FROM REPORT_FIELD_SETTING_T WHERE ID = #{modelId})
+    </select>
+
+    <select id="getSelectValue" parameterType="string" resultType="java.util.List">
+        SELECT ID as val, NAME as name FROM SYS_DICT_ITEM WHERE DICT_ID = #{id}
+    </select>
+
+    <select id="getSelectValue2" parameterType="string" resultType="java.util.List">
+        SELECT VALUE as val, NAME as name FROM REPORT_BPM_T WHERE BPM_TYPE = #{id}
+    </select>
+
+    <select id="getSelectValue3" parameterType="string" resultType="java.util.List">
+        SELECT ID as val ,NAME as name FROM SF_SERVICE_CATEGORY WHERE SYSFLAG = '1'
+    </select>
+
+    <select id="getSelectValue4" parameterType="string" resultType="java.util.List">
+        SELECT ID as val,CUS_NAME as name FROM CUSTOMER_INFO
+    </select>
+
+    <select id="getSelectValue5" parameterType="string" resultType="java.util.List">
+        SELECT ID as val,name FROM ${_parameter}
+    </select>
+
+    <delete id="deleteAllField" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_FIELD_SETTING_T WHERE ID IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <delete id="deleteAllDateField" parameterType="java.util.Arrays">
+        DELETE FROM REPORT_QUERY_SETTING_T WHERE MODEL_ID IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>
