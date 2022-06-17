@@ -14,6 +14,7 @@ import com.sungcor.baobiao.report.service.IReportQuerySettingService;
 import com.sungcor.baobiao.report.service.IReportTypeAttrService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Transactional
-@Service
+@Service("IReportModelService")
 public class ReportModelServiceImpl implements IReportModelService {
 
     @Autowired

@@ -20,7 +20,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Transactional
-@Service("customReport/reportTask")
+@Service("IReportTaskService")
 public class ReportTaskServiceImpl implements IReportTaskService {
 
 

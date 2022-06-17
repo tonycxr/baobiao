@@ -18,7 +18,7 @@ import java.util.Map;
  * Created by lenovo on 2016/5/27.
  */
 @Transactional
-@Service
+@Service("IReportTypeAttrService")
 public class ReportTypeAttrServiceImpl implements IReportTypeAttrService
 {
 

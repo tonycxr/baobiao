@@ -1,19 +1,21 @@
-package com.sungcor.baobiao.entity.dataSet;
-
+package com.chinawiserv.onecenter.itsm.customReport.dataSet;
 
 import com.runqian.report4.dataset.DataSet;
 import com.runqian.report4.dataset.IDataSetFactory;
 import com.runqian.report4.dataset.Row;
 import com.runqian.report4.usermodel.Context;
 import com.runqian.report4.usermodel.DataSetConfig;
+import com.sungcor.baobiao.STSMApplicationContext;
 import com.sungcor.baobiao.report.bean.ReportChartModelBean;
 import com.sungcor.baobiao.report.bean.ReportCustomIndexBean;
 import com.sungcor.baobiao.report.bean.ReportModelBean;
 import com.sungcor.baobiao.report.service.*;
 import com.sungcor.baobiao.report.util.CommReportUtil;
+import com.sungcor.baobiao.report.util.FindDates;
 import com.sungcor.baobiao.utils.ReportUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
@@ -24,19 +26,23 @@ import java.util.*;
  * Time: 上午10:53
  * To change this template use File | Settings | File Templates.
  */
-public class OrdinaryReportDataSet extends ReportUtil implements IDataSetFactory {
+@Service
+public class TrendReportDataSet extends ReportUtil implements IDataSetFactory {
+
     @Autowired
-    private IReportModelService reportModelService;
+    public IReportModelService reportModelService;
     @Autowired
-    private IReportService reportService;
+    public IReportService reportService;
     @Autowired
-    private IReportTypeAttrService reportTypeAttrService;
+    public IReportTypeAttrService reportTypeAttrService;
     @Autowired
-    private IReportTaskService reportTaskService;
+    public IReportTaskService reportTaskService;
     @Autowired
-    private IReportChartService reportChartService;
+    public IReportChartService reportChartService;
     @Autowired
     private IReportCustomIndexService reportCustomIndexService;
+
+
     @Override
     public DataSet createDataSet(Context context, DataSetConfig dataSetConfig, boolean b) {
 
@@ -62,6 +68,7 @@ public class OrdinaryReportDataSet extends ReportUtil implements IDataSetFactory
         ds1.addCol("chartType");
         ds1.addCol("chartTitle");
         ReportModelBean modelBean= reportModelService.findBeanById(modelId);
+        if(modelBean.getTypeId()==7){
             //获取报表的参数
             List<HashMap> queryList = new ArrayList<HashMap>();
             if ("".equals(taskId)) {
@@ -77,26 +84,47 @@ public class OrdinaryReportDataSet extends ReportUtil implements IDataSetFactory
             HashMap<String, Object> modelMap = new HashMap<String, Object>();
             modelMap.put("modelId", modelId);
             //获取维度
-            List<Map> reportStatDimensionBeanList = reportTypeAttrService.findSelDimIndex(modelMap);
             //获取指标
+            List<Map> reportDimList = new ArrayList<Map>();
             List<Map> reportStatIndexBeanList = reportTypeAttrService.findSelIndex(modelMap);
-
-
+            String dBegin = "";
+            String dEnd = "";
+            HashMap<String,Object> dimMap = reportTypeAttrService.findSelTrendDim(modelMap);
+            String timeType = dimMap.get("trendType").toString();
+            for(int i=0;i<queryList.size();i++){
+                HashMap qmap = queryList.get(i);
+                String fieldName = qmap.get("fieldName").toString();
+                String source = qmap.get("source")==null?"":qmap.get("source").toString();
+                if("".equals(source)){
+                    if("beginTime".equals(fieldName)){
+                        dBegin = qmap.get("fieldValue").toString();
+                    }if("endTime".equals(fieldName)){
+                        dEnd = qmap.get("fieldValue").toString();
+                    }if("datePurview".equals(fieldName)){
+                        HashMap<String, String> timeMap = reportService.getQueryDate(qmap.get("fieldValue").toString());
+                        dBegin = timeMap.get("beginTime");
+                        dEnd = timeMap.get("endTime");
+                    }
+                }
+            }
+            reportDimList = FindDates.findDates(dBegin,dEnd,timeType);
             //拼装维度所需数据
             List<HashMap> dimensionList = new ArrayList<HashMap>();
             //拼装指标所需数据
             List<HashMap> statIndexList = new ArrayList<HashMap>(new HashSet<HashMap>());
-            for (int i = 0; i < reportStatDimensionBeanList.size(); i++) {
+            String dbtype = STSMApplicationContext.getProperty("stsm.dbtype");
+            for (int i = 0; i < reportDimList.size(); i++) {
                 Row rr = ds1.addRow();
-                HashMap dimensionMap = new HashMap();
-                String id = reportStatDimensionBeanList.get(i).get("s_id").toString();
-                String source = reportStatDimensionBeanList.get(i).get("source").toString();
+
+                String id = reportDimList.get(i).get("id").toString();
+                String source = "trend";
                 rr.setData(1, source + "_" + id);
-                rr.setData(3, reportStatDimensionBeanList.get(i).get("name"));
+                rr.setData(3, reportDimList.get(i).get("name").toString());
                 rr.setData(4, "1");
 
+                HashMap dimensionMap = new HashMap();
                 dimensionMap.put("id", id);
-                dimensionMap.put("fieldName", reportStatDimensionBeanList.get(i).get("fieldName"));
+                dimensionMap.put("fieldName", FindDates.findFormat(timeType).get(dbtype));
                 dimensionMap.put("source", source);
                 dimensionList.add(dimensionMap);
             }
@@ -149,7 +177,8 @@ public class OrdinaryReportDataSet extends ReportUtil implements IDataSetFactory
                     rr.setData(7, StringUtils.isBlank(chartModelList.get(i).getTitle())?" ":chartModelList.get(i).getTitle());
                 }
             }
-//        }
+        }
+
         return ds1;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

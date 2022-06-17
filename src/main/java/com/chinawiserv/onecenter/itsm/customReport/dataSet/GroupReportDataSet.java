@@ -1,4 +1,4 @@
-package com.sungcor.baobiao.entity.dataSet;
+package com.chinawiserv.onecenter.itsm.customReport.dataSet;
 
 import com.runqian.report4.dataset.DataSet;
 import com.runqian.report4.dataset.IDataSetFactory;
@@ -10,6 +10,7 @@ import com.sungcor.baobiao.report.bean.ReportModelBean;
 import com.sungcor.baobiao.report.service.*;
 import com.sungcor.baobiao.utils.ReportUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,18 +24,19 @@ import java.util.Map;
  * Time: 下午1:49
  * To change this template use File | Settings | File Templates.
  */
+@Service
 public class GroupReportDataSet extends ReportUtil implements IDataSetFactory {
 
     @Autowired
-    private IReportService reportService;
+    public IReportService reportService;
     @Autowired
-    private IReportTypeAttrService reportTypeAttrService;
+    public IReportTypeAttrService reportTypeAttrService;
     @Autowired
-    private IReportTaskService reportTaskService;
+    public IReportTaskService reportTaskService;
     @Autowired
-    private IReportChartService reportChartService;
+    public IReportChartService reportChartService;
     @Autowired
-    private IReportModelService reportModelService;
+    public IReportModelService reportModelService;
     @Override
     public DataSet createDataSet(Context context, DataSetConfig dataSetConfig, boolean b) {
 

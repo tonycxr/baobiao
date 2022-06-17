@@ -42,4 +42,9 @@ public class User {
 
     private String areaId;//区域ID
 
+    public String getAreaId(){
+        return this.areaId;
+    }
+
+    public void setAreaId(String areaId){this.areaId=areaId;}
 }

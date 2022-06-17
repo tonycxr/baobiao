@@ -29,7 +29,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Transactional
-@Service
+@Service("IReportService")
 public class ReportServiceImpl implements IReportService {
 
     @Autowired
@@ -178,7 +178,7 @@ public class ReportServiceImpl implements IReportService {
         //增加对工单or资产的判断 end
 
         HashMap<String,String> m = new HashMap<String, String>();
-        String dbtype = STSMApplicationContext.getProperty("stsm.dbtype");//判断是连接的oracle还是mysql
+        String dbtype = "mysql";//判断是连接的oracle还是mysql
         DataSet ds1 = new DataSet("ds1");
         //维度Id
         ds1.addCol("dimensionId");

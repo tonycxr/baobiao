@@ -4,7 +4,8 @@ import com.sungcor.baobiao.STSMConstant;
 import com.sungcor.baobiao.entity.Area;
 import com.sungcor.baobiao.service.IRegionService;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
+
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;

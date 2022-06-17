@@ -3,7 +3,6 @@ package com.sungcor.baobiao.utils;
 import com.sungcor.baobiao.STSMConstant;
 import com.sungcor.baobiao.entity.LoginLogBean;
 import com.sungcor.baobiao.entity.UserInfoBean;
-import org.apache.struts2.ServletActionContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -72,7 +71,7 @@ public class SessionHelper {
      * 返回用户信息
      *
      * @param session
-     * @return {@link com.mainsteam.tmcm.stsm.sys.bean.UserInfoBean}
+     * @return
      */
     public static Object getUserInfo(HttpSession session) {
         return session.getAttribute(USER_INFO);
@@ -139,7 +138,7 @@ public class SessionHelper {
 
     /**
      *  记录登录日志
-     * @param session
+     * @param
      */
 //    private static void loginLog(HttpSession session){
 //        try {

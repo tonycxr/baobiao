@@ -20,7 +20,7 @@ import java.util.Map;
  * Created by lenovo on 2016/8/4.
  */
 @Transactional
-@Service("customReport/reportChart")
+@Service("IReportChartService")
 public class ReportChartServiceImpl implements IReportChartService
 {
 

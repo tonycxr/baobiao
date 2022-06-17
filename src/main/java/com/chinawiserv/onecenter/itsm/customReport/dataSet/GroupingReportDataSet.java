@@ -1,4 +1,4 @@
-package com.sungcor.baobiao.entity.dataSet;
+package com.chinawiserv.onecenter.itsm.customReport.dataSet;
 
 import com.runqian.report4.dataset.DataSet;
 import com.runqian.report4.dataset.IDataSetFactory;
@@ -13,6 +13,7 @@ import com.sungcor.baobiao.report.util.CommReportUtil;
 import com.sungcor.baobiao.utils.ReportUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,18 +23,19 @@ import java.util.Map;
 /**
  * Created by lenovo on 2016/6/16.
  */
+@Service
 public class GroupingReportDataSet extends ReportUtil implements IDataSetFactory
 {
     @Autowired
-    private IReportModelService reportModelService;
+    public IReportModelService reportModelService;
     @Autowired
-    private IReportService reportService;
+    public IReportService reportService;
     @Autowired
-    private IReportTypeAttrService reportTypeAttrService;
+    public IReportTypeAttrService reportTypeAttrService;
     @Autowired
-    private IReportTaskService reportTaskService;
+    public IReportTaskService reportTaskService;
     @Autowired
-    private IReportChartService reportChartService;
+    public IReportChartService reportChartService;
     @Autowired
     private IReportCustomIndexService reportCustomIndexService;
 

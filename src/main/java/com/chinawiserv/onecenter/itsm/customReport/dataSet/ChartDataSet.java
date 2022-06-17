@@ -1,4 +1,4 @@
-package com.sungcor.baobiao.entity.dataSet;
+package com.chinawiserv.onecenter.itsm.customReport.dataSet;
 
 
 import com.runqian.report4.dataset.DataSet;
@@ -14,24 +14,26 @@ import com.sungcor.baobiao.report.util.CommReportUtil;
 import com.sungcor.baobiao.report.util.FindDates;
 import com.sungcor.baobiao.utils.ReportUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 /**
  * Created by lenovo on 2016/8/5.
  */
+@Service
 public class ChartDataSet extends ReportUtil implements IDataSetFactory
 {
     @Autowired
-    private IReportService reportService;
+    public IReportService reportService;
     @Autowired
-    private IReportTypeAttrService reportTypeAttrService;
+    public IReportTypeAttrService reportTypeAttrService;
     @Autowired
-    private IReportChartService reportChartService;
+    public IReportChartService reportChartService;
     @Autowired
-    private IReportCustomIndexService reportCustomIndexService;
+    public IReportCustomIndexService reportCustomIndexService;
     @Autowired
-    private IReportTaskService reportTaskService;
+    public IReportTaskService reportTaskService;
     @Override
     public DataSet createDataSet(Context context, DataSetConfig dataSetConfig, boolean b) {
 

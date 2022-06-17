@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 @Transactional
-@Service
+@Service("IReportCustomIndexService")
 public class ReportCustomIndexImpl implements IReportCustomIndexService
 {
 
