@@ -1,7 +1,6 @@
 package com.sungcor.baobiao.report.bean;
 
 import lombok.Data;
-//import com.runqian.report4.dataset.DataSet;
 
 @Data
 public class Function {
