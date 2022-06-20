@@ -1,0 +1,138 @@
+.class com.runqian.report4.model.engine2.CCellEngine CCellEngine
+.class com.runqian.report4.model.engine2.CSVariable2 CSVariable2
+.field com.runqian.report4.model.engine2.CSVariable2 sourceCell Lcom/runqian/report4/model/engine2/SrcCell; _$1
+.field com.runqian.report4.model.engine2.CSVariable2 head Lcom/runqian/report4/model/engine2/ExtRow; _$2
+.field com.runqian.report4.model.engine2.CSVariable2 isSaved Z _$3
+.field com.runqian.report4.model.engine2.CSVariable2 rowCount I _$4
+.field com.runqian.report4.model.engine2.CSVariable2 isLineCoord Z _$5
+.method com.runqian.report4.model.engine2.CSVariable2 getCell (Lcom/runqian/report4/model/engine2/ExtRow;)Lcom/runqian/report4/model/engine2/ExtRow; _$1
+.method com.runqian.report4.model.engine2.CSVariable2 getCells (Lcom/runqian/report4/model/engine2/ExtRow;Ljava/util/List;)Ljava/util/List; _$1
+.method com.runqian.report4.model.engine2.CSVariable2 getCells12 (Lcom/runqian/report4/model/engine2/ExtRow;Ljava/util/List;)Ljava/util/List; _$2
+.method com.runqian.report4.model.engine2.CSVariable2 getCells3 (Lcom/runqian/report4/model/engine2/ExtRow;Ljava/util/List;)Ljava/util/List; _$3
+.method com.runqian.report4.model.engine2.CSVariable2 getNextParent (Lcom/runqian/report4/model/engine2/ExtRow;I)Lcom/runqian/report4/model/engine2/ExtRow; _$1
+.method com.runqian.report4.model.engine2.CSVariable2 getCellsLineCoord (Ljava/util/List;)Ljava/util/List; _$1
+.class com.runqian.report4.model.engine2.ExtCCell ExtCCell
+.class com.runqian.report4.model.engine2.ExtNCell ExtNCell
+.field com.runqian.report4.model.engine2.ExtNCell style Ljava/lang/String; _$1
+.class com.runqian.report4.model.engine2.ExtRow ExtRow
+.class com.runqian.report4.model.engine2.ExtPRow ExtPRow
+.class com.runqian.report4.model.engine2.ExtRCell ExtRCell
+.class com.runqian.report4.model.engine2.RCellEngine RCellEngine
+.class com.runqian.report4.model.engine2.RowEngine RowEngine
+.class com.runqian.report4.model.engine2.RowReport RowReport
+.field com.runqian.report4.model.engine2.RowReport FLAG_BIT_SIGN S _$1
+.field com.runqian.report4.model.engine2.RowReport FLAG_BIT_GROUP_HEAD S _$2
+.field com.runqian.report4.model.engine2.RowReport FLAG_BIT_THIRD_EXP S _$3
+.field com.runqian.report4.model.engine2.RowReport complicated Lcom/runqian/report4/model/ExtList; _$4
+.field com.runqian.report4.model.engine2.RowReport currentCellSet Lcom/runqian/report4/usermodel/Area; _$5
+.field com.runqian.report4.model.engine2.RowReport currentPage Lcom/runqian/report4/usermodel/Area; _$6
+.field com.runqian.report4.model.engine2.RowReport engine Lcom/runqian/report4/model/Matrix; _$7
+.field com.runqian.report4.model.engine2.RowReport rd Lcom/runqian/report4/model/ReportDefine; _$8
+.field com.runqian.report4.model.engine2.RowReport rowLists Lcom/runqian/report4/model/ExtList; _$9
+.field com.runqian.report4.model.engine2.RowReport current Lcom/runqian/report4/model/engine2/ExtNCell; _$10
+.field com.runqian.report4.model.engine2.RowReport savedCurrent Lcom/runqian/report4/model/engine2/ExtNCell; _$11
+.field com.runqian.report4.model.engine2.RowReport cell00 Lcom/runqian/report4/model/engine2/ExtNCell; _$12
+.field com.runqian.report4.model.engine2.RowReport thirdList Lcom/runqian/base4/util/Queue; _$13
+.field com.runqian.report4.model.engine2.RowReport paramMap Ljava/util/Map; _$14
+.field com.runqian.report4.model.engine2.RowReport context Lcom/runqian/report4/usermodel/Context; _$15
+.field com.runqian.report4.model.engine2.RowReport colCount I _$16
+.field com.runqian.report4.model.engine2.RowReport rowCount I _$17
+.field com.runqian.report4.model.engine2.RowReport fv Lcom/runqian/report4/usermodel/input/FlowVar; _$18
+.field com.runqian.report4.model.engine2.RowReport currentState B _$19
+.field com.runqian.report4.model.engine2.RowReport flagBit S _$20
+.field com.runqian.report4.model.engine2.RowReport isLoaded Z _$21
+.field com.runqian.report4.model.engine2.RowReport hasSemanticsExp Z _$22
+.field com.runqian.report4.model.engine2.RowReport hasDS Z _$23
+.field com.runqian.report4.model.engine2.RowReport thirdSortList Ljava/util/List; _$24
+.field com.runqian.report4.model.engine2.RowReport titleHeaderEndRow I _$25
+.field com.runqian.report4.model.engine2.RowReport titleFooterStartRow I _$26
+.field com.runqian.report4.model.engine2.RowReport interrupt Z _$27
+.method com.runqian.report4.model.engine2.RowReport calcCells (Lcom/runqian/report4/model/engine2/ExtRow;Lcom/runqian/report4/model/engine2/ExtRow;Lcom/runqian/report4/model/engine2/SrcCell;Lcom/runqian/report4/usermodel/Context;)V _$1
+.method com.runqian.report4.model.engine2.RowReport sortCell (Lcom/runqian/base4/util/Queue;)Lcom/runqian/base4/util/Queue; _$1
+.method com.runqian.report4.model.engine2.RowReport sortThreadCell ()Lcom/runqian/base4/util/Queue; _$1
+.method com.runqian.report4.model.engine2.RowReport changeExtendRow (Lcom/runqian/report4/model/engine2/ExtRow;)Lcom/runqian/report4/model/engine2/ExtPRow; _$1
+.method com.runqian.report4.model.engine2.RowReport getBeginRow (Lcom/runqian/report4/model/engine2/ExtRow;)I _$2
+.method com.runqian.report4.model.engine2.RowReport getEndRow (Lcom/runqian/report4/model/engine2/ExtRow;)I _$3
+.method com.runqian.report4.model.engine2.RowReport clear ()V _$2
+.method com.runqian.report4.model.engine2.RowReport pageCalc$ (Lcom/runqian/report4/usermodel/Area;Lcom/runqian/report4/usermodel/Area;)V _$1
+.method com.runqian.report4.model.engine2.RowReport checkNonlinear (Lcom/runqian/report4/usermodel/Context;)Z _$1
+.method com.runqian.report4.model.engine2.RowReport checkNonlinearLimit ()B _$3
+.method com.runqian.report4.model.engine2.RowReport getDetailPos (II)I _$1
+.method com.runqian.report4.model.engine2.RowReport createNewRow (II)Lcom/runqian/report4/model/engine2/ExtRow; _$2
+.method com.runqian.report4.model.engine2.RowReport setRowField ()V _$4
+.class com.runqian.report4.model.engine2.SimplePager2 SimplePager2
+.field com.runqian.report4.model.engine2.SimplePager2 pageHeaderEnd I _$1
+.field com.runqian.report4.model.engine2.SimplePager2 titleHeaderEnd I _$2
+.field com.runqian.report4.model.engine2.SimplePager2 tableHeaderEnd I _$3
+.field com.runqian.report4.model.engine2.SimplePager2 dataFieldEnd I _$4
+.field com.runqian.report4.model.engine2.SimplePager2 tableFooterEnd I _$5
+.field com.runqian.report4.model.engine2.SimplePager2 titleFooterEnd I _$6
+.field com.runqian.report4.model.engine2.SimplePager2 pageFooterEnd I _$7
+.field com.runqian.report4.model.engine2.SimplePager2 leftHeaderEnd S _$8
+.field com.runqian.report4.model.engine2.SimplePager2 rightHeaderStart S _$9
+.field com.runqian.report4.model.engine2.SimplePager2 rightHeaderEnd S _$10
+.field com.runqian.report4.model.engine2.SimplePager2 pageHeaderMode B _$11
+.field com.runqian.report4.model.engine2.SimplePager2 titleMode B _$12
+.field com.runqian.report4.model.engine2.SimplePager2 rowTableHeadMode B _$13
+.field com.runqian.report4.model.engine2.SimplePager2 colHeadMode B _$14
+.field com.runqian.report4.model.engine2.SimplePager2 pageHeadFootXMode B _$15
+.field com.runqian.report4.model.engine2.SimplePager2 titleHeadFootXMode B _$16
+.field com.runqian.report4.model.engine2.SimplePager2 unit B _$17
+.field com.runqian.report4.model.engine2.SimplePager2 cellStatic Lcom/runqian/report4/model/engine2/ExtNCell; _$18
+.field com.runqian.report4.model.engine2.SimplePager2 pi Lcom/runqian/report4/usermodel/PagerInfo; _$19
+.field com.runqian.report4.model.engine2.SimplePager2 interrupt Z _$20
+.field com.runqian.report4.model.engine2.SimplePager2 CD_YES B _$21
+.field com.runqian.report4.model.engine2.SimplePager2 CD_NO B _$22
+.field com.runqian.report4.model.engine2.SimplePager2 CD_PAGEBREAK B _$23
+.field com.runqian.report4.model.engine2.SimplePager2 CD_HIDE B _$24
+.method com.runqian.report4.model.engine2.SimplePager2 checkGroupRowValidity (Lcom/runqian/report4/model/engine2/RowReport;I)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 splitPageRows (Lcom/runqian/report4/model/engine2/RowReport;BI)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 splitPageCols (Lcom/runqian/report4/model/engine2/RowReport;Lcom/runqian/report4/model/engine2/SimplePager2$PageIdleCache;I)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 getFieldHeight (Lcom/runqian/report4/usermodel/IReport;II)I _$1
+.method com.runqian.report4.model.engine2.SimplePager2 getFieldWidth (Lcom/runqian/report4/usermodel/IReport;SS)I _$1
+.method com.runqian.report4.model.engine2.SimplePager2 setRowField ()V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 setColField ()V _$2
+.method com.runqian.report4.model.engine2.SimplePager2 canDisplayRow (II)B _$1
+.method com.runqian.report4.model.engine2.SimplePager2 canDisplayCol (Lcom/runqian/report4/usermodel/IReport;II)B _$2
+.method com.runqian.report4.model.engine2.SimplePager2 createPage (Lcom/runqian/report4/model/engine2/RowReport;Lcom/runqian/report4/model/engine2/SimplePager2$PageIdleCache;Lcom/runqian/report4/usermodel/Area;)Lcom/runqian/report4/usermodel/IReport; _$1
+.method com.runqian.report4.model.engine2.SimplePager2 lastCol (Lcom/runqian/report4/model/engine2/RowReport;Lcom/runqian/report4/usermodel/IReport;I)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 copyHeadFootTileRow (Lcom/runqian/report4/model/engine2/RowReport;IIBLcom/runqian/report4/usermodel/IReport;ILcom/runqian/report4/model/engine2/SimplePager2$PageIdleCache;S)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 adjustCol (Lcom/runqian/report4/model/engine2/RowReport;Lcom/runqian/report4/model/engine2/ExtRow;Lcom/runqian/report4/usermodel/IReport;I)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 flexCell (Lcom/runqian/report4/model/engine2/RowReport;Lcom/runqian/report4/usermodel/Area;Lcom/runqian/report4/usermodel/IReport;Lcom/runqian/report4/usermodel/Area;SI)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 copyAreaTo (Lcom/runqian/report4/model/engine2/RowReport;Lcom/runqian/report4/usermodel/Area;Lcom/runqian/report4/usermodel/IReport;Lcom/runqian/report4/usermodel/Area;SI)V _$2
+.method com.runqian.report4.model.engine2.SimplePager2 copyRowHeadTo (Lcom/runqian/report4/usermodel/IRowCell;Lcom/runqian/report4/usermodel/IRowCell;)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 copyColHeadTo (Lcom/runqian/report4/usermodel/IColCell;Lcom/runqian/report4/usermodel/IColCell;)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 copyCellTo (Lcom/runqian/report4/usermodel/INormalCell;Lcom/runqian/report4/usermodel/INormalCell;)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2 copyCellBordTo (Lcom/runqian/report4/model/engine2/RowReport;ISLcom/runqian/report4/usermodel/INormalCell;)V _$1
+.class com.runqian.report4.model.engine2.SimplePager2$GroupInfo llIlIIlIlIllllII
+.field com.runqian.report4.model.engine2.SimplePager2$GroupInfo rowIndex I _$1
+.field com.runqian.report4.model.engine2.SimplePager2$GroupInfo groupLevel B _$2
+.method com.runqian.report4.model.engine2.SimplePager2$GroupInfo getRowIndex ()I _$1
+.method com.runqian.report4.model.engine2.SimplePager2$GroupInfo getGroupLevel ()B _$2
+.class com.runqian.report4.model.engine2.SimplePager2$PageIdleCache PageIdleCache
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache HAVE_PAGE I _$1
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache HAVE_TITLE I _$2
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache HAVE_TABLE I _$3
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache HAVE_LEFT I _$4
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache HAVE_RIGHT I _$5
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache IS_FIRST_ROW_PAGE I _$6
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache IS_FIRST_COL_PAGE I _$7
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache IS_LAST_COL_PAGE I _$8
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache HAVE_ROW_HEAD I _$9
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache HAVE_COL_HEAD I _$10
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache PROP_MASK_ROW I _$11
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache PROP_MASK_COL I _$12
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache PROP_MASK_ALL I _$13
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache decStartRow I _$14
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache decTotalRow I _$15
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache decStartCol S _$16
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache decTotalCol S _$17
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache pageFlag I _$18
+.field com.runqian.report4.model.engine2.SimplePager2$PageIdleCache groupArray [I _$19
+.method com.runqian.report4.model.engine2.SimplePager2$PageIdleCache setTarget (ISIS)V _$1
+.method com.runqian.report4.model.engine2.SimplePager2$PageIdleCache setPageFlag (I)V _$1
+.class com.runqian.report4.model.engine2.SrcCell SrcCell
+.method com.runqian.report4.model.engine2.SrcCell getFileBytes (Ljava/lang/String;ZLcom/runqian/report4/usermodel/Context;)[B _$1
+.method com.runqian.report4.model.engine2.SrcCell getPrivatePropertyMap (Lcom/runqian/report4/model/engine2/ExtRow;)Lcom/runqian/report4/usermodel/IByteMap; _$1
+.method com.runqian.report4.model.engine2.SrcCell setDs (Lcom/runqian/report4/model/engine2/ExtRow;)V _$2
+.class com.runqian.report4.model.engine2.SimplePager2$1 IIlllIIlllIlllII

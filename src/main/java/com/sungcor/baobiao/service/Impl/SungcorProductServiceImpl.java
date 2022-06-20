@@ -122,9 +122,9 @@ public class SungcorProductServiceImpl implements ISungcorProductService {
     }
 
     @Override
-    public Result getTheExcel(HttpServletResponse response){
+    public Result getTheExcel(HttpServletResponse response,String name){
         try {
-            String fileName = "export";
+            String fileName = name;
             String sheetName = "sheet";
             List<String> titleList = new ArrayList<>();
             for(Field field:SungcorProduct.class.getDeclaredFields()){

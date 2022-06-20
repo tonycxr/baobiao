@@ -45,7 +45,7 @@ public class ReportFormController {
     }
 
     @GetMapping("/getTheExcel")
-    public Result getTheExcel(HttpServletResponse response) throws Exception {
-        return sungcorProductService.getTheExcel(response);
+    public Result getTheExcel(HttpServletResponse response,@RequestParam(value = "name") String name) throws Exception {
+        return sungcorProductService.getTheExcel(response,name);
     }
 }

@@ -1,0 +1,42 @@
+.class com.runqian.report4.view.text.TextCell TextCell
+.field com.runqian.report4.view.text.TextCell TOP S _$1
+.field com.runqian.report4.view.text.TextCell BOTTOM S _$2
+.field com.runqian.report4.view.text.TextCell LEFT S _$3
+.field com.runqian.report4.view.text.TextCell RIGHT S _$4
+.field com.runqian.report4.view.text.TextCell parser Lcom/runqian/report4/util/ReportParser; _$5
+.field com.runqian.report4.view.text.TextCell row I _$6
+.field com.runqian.report4.view.text.TextCell col S _$7
+.field com.runqian.report4.view.text.TextCell width I _$8
+.field com.runqian.report4.view.text.TextCell hasPrinterCode Z _$9
+.field com.runqian.report4.view.text.TextCell cols S _$10
+.field com.runqian.report4.view.text.TextCell rows I _$11
+.field com.runqian.report4.view.text.TextCell colWidths [I _$12
+.field com.runqian.report4.view.text.TextCell hasHLine Z _$13
+.field com.runqian.report4.view.text.TextCell lCell Lcom/runqian/report4/usermodel/INormalCell; _$14
+.field com.runqian.report4.view.text.TextCell tCell Lcom/runqian/report4/usermodel/INormalCell; _$15
+.field com.runqian.report4.view.text.TextCell cell Lcom/runqian/report4/usermodel/INormalCell; _$16
+.field com.runqian.report4.view.text.TextCell hasLeft Z _$17
+.field com.runqian.report4.view.text.TextCell hasTop Z _$18
+.field com.runqian.report4.view.text.TextCell hasRight Z _$19
+.field com.runqian.report4.view.text.TextCell hasBottom Z _$20
+.field com.runqian.report4.view.text.TextCell leftBold Z _$21
+.field com.runqian.report4.view.text.TextCell topBold Z _$22
+.field com.runqian.report4.view.text.TextCell rightBold Z _$23
+.field com.runqian.report4.view.text.TextCell bottomBold Z _$24
+.method com.runqian.report4.view.text.TextCell isBorderBold (Lcom/runqian/report4/usermodel/INormalCell;S)Z _$1
+.method com.runqian.report4.view.text.TextCell hasBorder (Lcom/runqian/report4/usermodel/INormalCell;SIS)Z _$1
+.method com.runqian.report4.view.text.TextCell getLength (Ljava/lang/String;)I _$1
+.method com.runqian.report4.view.text.TextCell append (Ljava/lang/StringBuffer;ILjava/lang/String;I)Ljava/lang/StringBuffer; _$1
+.method com.runqian.report4.view.text.TextCell write (Ljava/io/Writer;ILjava/lang/String;I)Ljava/io/Writer; _$1
+.method com.runqian.report4.view.text.TextCell split (Ljava/lang/String;I)[Ljava/lang/String; _$1
+.class com.runqian.report4.view.text.TextFile TextFile
+.field com.runqian.report4.view.text.TextFile separator Ljava/lang/String; _$1
+.field com.runqian.report4.view.text.TextFile report Lcom/runqian/report4/usermodel/IReport; _$2
+.field com.runqian.report4.view.text.TextFile saveDispValue Z _$3
+.field com.runqian.report4.view.text.TextFile lineBreak Ljava/lang/String; _$4
+.method com.runqian.report4.view.text.TextFile getText (ISLcom/runqian/report4/util/ReportParser;)Ljava/lang/String; _$1
+.method com.runqian.report4.view.text.TextFile getValue (Lcom/runqian/report4/usermodel/INormalCell;)Ljava/lang/String; _$1
+.class com.runqian.report4.view.text.TextFileServlet TextFileServlet
+.class com.runqian.report4.view.text.TextReport TextReport
+.field com.runqian.report4.view.text.TextReport parser Lcom/runqian/report4/util/ReportParser; _$1
+.field com.runqian.report4.view.text.TextReport exportEmptyLine Z _$2

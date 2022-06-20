@@ -1,0 +1,48 @@
+.class com.runqian.report4.view.applet.AReport AReport
+.field com.runqian.report4.view.applet.AReport report Lcom/runqian/report4/usermodel/IReport; _$1
+.field com.runqian.report4.view.applet.AReport pb Lcom/runqian/report4/model/engine/PageBuilder; _$2
+.field com.runqian.report4.view.applet.AReport pf Ljava/awt/print/PageFormat; _$3
+.field com.runqian.report4.view.applet.AReport printBook Ljava/awt/print/Book; _$4
+.field com.runqian.report4.view.applet.AReport pageCounts I _$5
+.field com.runqian.report4.view.applet.AReport shrink B _$6
+.field com.runqian.report4.view.applet.AReport truePf Ljava/awt/print/PageFormat; _$7
+.field com.runqian.report4.view.applet.AReport shrinkScale D _$8
+.field com.runqian.report4.view.applet.AReport align B _$9
+.field com.runqian.report4.view.applet.AReport canSetAlign Z _$10
+.field com.runqian.report4.view.applet.AReport hideContainer Ljavax/swing/JPanel; _$11
+.method com.runqian.report4.view.applet.AReport createPageBuilder ()V _$1
+.method com.runqian.report4.view.applet.AReport getTruePageFormat (D)Ljava/awt/print/PageFormat; _$1
+.method com.runqian.report4.view.applet.AReport initPrintWindow ()V _$2
+.class com.runqian.report4.view.applet.DirectPrintApplet DirectPrintApplet
+.field com.runqian.report4.view.applet.DirectPrintApplet printButton Ljavax/swing/JButton; _$1
+.field com.runqian.report4.view.applet.DirectPrintApplet mm Lcom/runqian/base4/resources/MessageManager; _$2
+.field com.runqian.report4.view.applet.DirectPrintApplet appRoot Ljava/lang/String; _$3
+.field com.runqian.report4.view.applet.DirectPrintApplet dataServlet Ljava/lang/String; _$4
+.field com.runqian.report4.view.applet.DirectPrintApplet srcType Ljava/lang/String; _$5
+.field com.runqian.report4.view.applet.DirectPrintApplet fileName Ljava/lang/String; _$6
+.field com.runqian.report4.view.applet.DirectPrintApplet reportParamsId Ljava/lang/String; _$7
+.field com.runqian.report4.view.applet.DirectPrintApplet cachedId Ljava/lang/String; _$8
+.field com.runqian.report4.view.applet.DirectPrintApplet fontFace Ljava/lang/String; _$9
+.field com.runqian.report4.view.applet.DirectPrintApplet fontSize Ljava/lang/String; _$10
+.field com.runqian.report4.view.applet.DirectPrintApplet fontColor Ljava/lang/String; _$11
+.field com.runqian.report4.view.applet.DirectPrintApplet backColor Ljava/lang/String; _$12
+.field com.runqian.report4.view.applet.DirectPrintApplet label Ljava/lang/String; _$13
+.field com.runqian.report4.view.applet.DirectPrintApplet needPrintPrompt Ljava/lang/String; _$14
+.field com.runqian.report4.view.applet.DirectPrintApplet needSelectPrinter Ljava/lang/String; _$15
+.method com.runqian.report4.view.applet.DirectPrintApplet initParameters ()V _$1
+.method com.runqian.report4.view.applet.DirectPrintApplet getParameter (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String; _$1
+.method com.runqian.report4.view.applet.DirectPrintApplet toColor (Ljava/lang/String;Ljava/awt/Color;)Ljava/awt/Color; _$1
+.class com.runqian.report4.view.applet.HtmlPrintApplet HtmlPrintApplet
+.field com.runqian.report4.view.applet.HtmlPrintApplet appRoot Ljava/lang/String; _$1
+.field com.runqian.report4.view.applet.HtmlPrintApplet dataServlet Ljava/lang/String; _$2
+.field com.runqian.report4.view.applet.HtmlPrintApplet fileName Ljava/lang/String; _$3
+.field com.runqian.report4.view.applet.HtmlPrintApplet srcType Ljava/lang/String; _$4
+.field com.runqian.report4.view.applet.HtmlPrintApplet pb Lcom/runqian/report4/model/engine/PageBuilder; _$5
+.field com.runqian.report4.view.applet.HtmlPrintApplet reportParamsId Ljava/lang/String; _$6
+.field com.runqian.report4.view.applet.HtmlPrintApplet cachedId Ljava/lang/String; _$7
+.field com.runqian.report4.view.applet.HtmlPrintApplet userUnitName Ljava/lang/String; _$8
+.field com.runqian.report4.view.applet.HtmlPrintApplet savePrintSetup Ljava/lang/String; _$9
+.field com.runqian.report4.view.applet.HtmlPrintApplet mm Lcom/runqian/base4/resources/MessageManager; _$10
+.method com.runqian.report4.view.applet.HtmlPrintApplet initParameters ()V _$1
+.method com.runqian.report4.view.applet.HtmlPrintApplet getParameter (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String; _$1
+.class com.runqian.report4.view.applet.AReport$1 IIlIlIlIllIllIIl

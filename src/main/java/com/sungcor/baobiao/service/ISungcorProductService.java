@@ -12,5 +12,5 @@ public interface ISungcorProductService {
     SungcorProduct getSungcorProduct(String productName);
     Integer getProductProfit(Map map);
     Result getTheRaq(Map map) throws Throwable;
-    Result getTheExcel(HttpServletResponse response);
+    Result getTheExcel(HttpServletResponse response,String name);
 }

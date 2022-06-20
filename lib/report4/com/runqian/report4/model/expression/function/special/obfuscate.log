@@ -1,0 +1,36 @@
+.class com.runqian.report4.model.expression.function.special.Move Move
+.field com.runqian.report4.model.expression.function.special.Move cs Lcom/runqian/report4/model/engine/ExtCellSet; _$1
+.method com.runqian.report4.model.expression.function.special.Move getCell (Lcom/runqian/report4/model/engine/CSVariable;)Ljava/lang/Object; _$1
+.method com.runqian.report4.model.expression.function.special.Move getCell (Lcom/runqian/report4/model/engine/CSVariable;Lcom/runqian/report4/usermodel/Context;Z)Ljava/lang/Object; _$1
+.method com.runqian.report4.model.expression.function.special.Move cal (Lcom/runqian/report4/usermodel/Context;Lcom/runqian/report4/model/engine/ExtCell;II)Ljava/lang/Object; _$1
+.method com.runqian.report4.model.expression.function.special.Move getNextTopHead (Lcom/runqian/report4/model/engine/ExtCell;I)Lcom/runqian/report4/model/engine/ExtCell; _$1
+.method com.runqian.report4.model.expression.function.special.Move getNextLeftHead (Lcom/runqian/report4/model/engine/ExtCell;I)Lcom/runqian/report4/model/engine/ExtCell; _$2
+.method com.runqian.report4.model.expression.function.special.Move getTopHead (Lcom/runqian/report4/model/engine/ExtCell;I)Lcom/runqian/report4/model/engine/ExtCell; _$3
+.method com.runqian.report4.model.expression.function.special.Move getLeftHead (Lcom/runqian/report4/model/engine/ExtCell;I)Lcom/runqian/report4/model/engine/ExtCell; _$4
+.class com.runqian.report4.model.expression.function.special.Move$ScopeMove IlIlIIIllIllIIlI
+.field com.runqian.report4.model.expression.function.special.Move$ScopeMove TYPE_ABSOLUTE B _$1
+.field com.runqian.report4.model.expression.function.special.Move$ScopeMove TYPE_RELATIVE B _$2
+.field com.runqian.report4.model.expression.function.special.Move$ScopeMove TYPE_NOPOSITION B _$3
+.field com.runqian.report4.model.expression.function.special.Move$ScopeMove position I _$4
+.field com.runqian.report4.model.expression.function.special.Move$ScopeMove source Lcom/runqian/report4/model/engine/ExtCell; _$5
+.field com.runqian.report4.model.expression.function.special.Move$ScopeMove type B _$6
+.field com.runqian.report4.model.expression.function.special.Move$ScopeMove isFact Z _$7
+.class com.runqian.report4.model.expression.function.special.Move2 Move2
+.field com.runqian.report4.model.expression.function.special.Move2 cs Lcom/runqian/report4/model/engine2/RowReport; _$1
+.method com.runqian.report4.model.expression.function.special.Move2 getCell (Lcom/runqian/report4/model/engine2/CSVariable2;)Ljava/lang/Object; _$1
+.method com.runqian.report4.model.expression.function.special.Move2 getCell (Lcom/runqian/report4/model/engine2/CSVariable2;Lcom/runqian/report4/usermodel/Context;Z)Ljava/lang/Object; _$1
+.method com.runqian.report4.model.expression.function.special.Move2 cal (Lcom/runqian/report4/model/engine2/SrcCell;I)Ljava/lang/Object; _$1
+.method com.runqian.report4.model.expression.function.special.Move2 getParent (Lcom/runqian/report4/model/engine2/ExtRow;I)Lcom/runqian/report4/model/engine2/ExtRow; _$1
+.method com.runqian.report4.model.expression.function.special.Move2 getNextParent (Lcom/runqian/report4/model/engine2/ExtRow;I)Lcom/runqian/report4/model/engine2/ExtRow; _$2
+.class com.runqian.report4.model.expression.function.special.Move2$ScopeMove lIllIIllIllIllII
+.field com.runqian.report4.model.expression.function.special.Move2$ScopeMove TYPE_ABSOLUTE B _$1
+.field com.runqian.report4.model.expression.function.special.Move2$ScopeMove TYPE_RELATIVE B _$2
+.field com.runqian.report4.model.expression.function.special.Move2$ScopeMove TYPE_NOPOSITION B _$3
+.field com.runqian.report4.model.expression.function.special.Move2$ScopeMove position I _$4
+.field com.runqian.report4.model.expression.function.special.Move2$ScopeMove source Lcom/runqian/report4/model/engine2/SrcCell; _$5
+.field com.runqian.report4.model.expression.function.special.Move2$ScopeMove type B _$6
+.class com.runqian.report4.model.expression.function.special.Offset Offset
+.class com.runqian.report4.model.expression.function.special.Select Select
+.field com.runqian.report4.model.expression.function.special.Select cs Lcom/runqian/report4/usermodel/IReport; _$1
+.method com.runqian.report4.model.expression.function.special.Select getList (Lcom/runqian/report4/model/engine/ExtCellSet;Lcom/runqian/report4/usermodel/Context;Lcom/runqian/report4/model/engine/CSVariable;Z)Ljava/util/List; _$1
+.method com.runqian.report4.model.expression.function.special.Select getList2 (Lcom/runqian/report4/model/engine2/RowReport;Lcom/runqian/report4/usermodel/Context;Lcom/runqian/report4/model/engine2/CSVariable2;Z)Ljava/util/List; _$1

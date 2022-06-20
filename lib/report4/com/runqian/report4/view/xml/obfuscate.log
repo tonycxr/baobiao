@@ -1,0 +1,9 @@
+.class com.runqian.report4.view.xml.XMLReport XMLReport
+.field com.runqian.report4.view.xml.XMLReport buf Ljava/lang/StringBuffer; _$1
+.field com.runqian.report4.view.xml.XMLReport reportCount S _$2
+.field com.runqian.report4.view.xml.XMLReport pbCount S _$3
+.method com.runqian.report4.view.xml.XMLReport initBuf ()V _$1
+.method com.runqian.report4.view.xml.XMLReport exportReport (Ljava/lang/String;Lcom/runqian/report4/usermodel/IReport;)V _$1
+.method com.runqian.report4.view.xml.XMLReport getText (SLcom/runqian/report4/usermodel/INormalCell;)Ljava/lang/String; _$1
+.method com.runqian.report4.view.xml.XMLReport getDisp (Lcom/runqian/report4/usermodel/INormalCell;)Ljava/lang/String; _$1
+.method com.runqian.report4.view.xml.XMLReport getValue (Lcom/runqian/report4/usermodel/INormalCell;)Ljava/lang/String; _$2
