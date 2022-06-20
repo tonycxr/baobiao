@@ -116,6 +116,7 @@ public class SungcorProductServiceImpl implements ISungcorProductService {
         }catch (FileNotFoundException e){
             return Result.error("文件不存在");
         }catch (Exception e){
+            System.out.println("");
             return Result.error("读取文件错误");
         }
         return Result.error("文件类型输入错误");
