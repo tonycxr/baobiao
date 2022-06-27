@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
@@ -40,12 +41,17 @@ public class ReportFormController {
     }
 
     @PostMapping("/getTheRaq")
-    public Result getTheRaq(@RequestBody Map map)throws Throwable{
-        return sungcorProductService.getTheRaq(map);
+    public Result getTheRaq(HttpServletResponse response,@RequestBody Map map)throws Throwable{
+        return sungcorProductService.getTheRaq(response,map);
     }
 
     @GetMapping("/getTheExcel")
     public Result getTheExcel(HttpServletResponse response,@RequestParam(value = "name") String name) throws Exception {
         return sungcorProductService.getTheExcel(response,name);
+    }
+
+    @GetMapping("/getAnnotationExcel")
+    public Result getAnnotationExcel(@RequestBody Map map){
+        return sungcorProductService.getAnnotationExcel(map);
     }
 }
