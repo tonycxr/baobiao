@@ -4,6 +4,11 @@ spring:
     username: root
     password: 123589
     driver-class-name: com.mysql.cj.jdbc.Driver
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: Guest123
 
 mybatis:
   config-location: classpath:mybatis-config.xml

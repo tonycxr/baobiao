@@ -16,7 +16,7 @@
         SELECT *  FROM sungcorproduct  WHERE  productName=#{productName}
     </select>
 
-    <select id="getAllSungcorProduct" parameterType="String" resultType="sungcorProduct">
+    <select id="getAllSungcorProduct" parameterType="String" resultType="com.sungcor.baobiao.entity.SungcorProduct">
         SELECT *  FROM sungcorproduct
     </select>
 

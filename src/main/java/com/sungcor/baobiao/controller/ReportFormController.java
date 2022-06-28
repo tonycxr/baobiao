@@ -3,6 +3,7 @@ package com.sungcor.baobiao.controller;
 import com.sungcor.baobiao.entity.Result;
 import com.sungcor.baobiao.entity.SungcorProduct;
 import com.sungcor.baobiao.report.service.IReportService;
+import com.sungcor.baobiao.service.IProductOrderService;
 import com.sungcor.baobiao.service.ISungcorProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,19 @@ public class ReportFormController {
 
     @Autowired
     private ISungcorProductService sungcorProductService;
+
+    @Autowired
+    private IProductOrderService productOrderService;
+
+    @PostMapping("/buyProductByThread")
+    public Result buyProductByThread(@RequestBody Map map){
+        return productOrderService.buyByThread(map);
+    }
+
+    @PostMapping("/buyProduct")
+    public Result buyProduct(@RequestBody Map map){
+        return productOrderService.buy(map);
+    }
 
     @PostMapping("/getSungcorProduct")
     public SungcorProduct getSungcorProduct(@RequestBody Map map){
