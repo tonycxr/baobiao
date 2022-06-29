@@ -17,23 +17,8 @@ import java.util.Map;
 public class ReportFormController {
 
     @Autowired
-    private IReportService reportService;
-
-    @Autowired
     private ISungcorProductService sungcorProductService;
 
-    @Autowired
-    private IProductOrderService productOrderService;
-
-    @PostMapping("/buyProductByThread")
-    public Result buyProductByThread(@RequestBody Map map){
-        return productOrderService.buyByThread(map);
-    }
-
-    @PostMapping("/buyProduct")
-    public Result buyProduct(@RequestBody Map map){
-        return productOrderService.buy(map);
-    }
 
     @PostMapping("/getSungcorProduct")
     public SungcorProduct getSungcorProduct(@RequestBody Map map){

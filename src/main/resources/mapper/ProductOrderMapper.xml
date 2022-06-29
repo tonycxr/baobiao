@@ -21,4 +21,8 @@
         UPDATE productsselling set count = #{count} WHERE ID = #{id}
     </update>
 
+    <update id="getGoods" parameterType="com.sungcor.baobiao.entity.Product">
+        UPDATE productsselling set count = 600
+    </update>
+
 </mapper>
