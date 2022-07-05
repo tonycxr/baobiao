@@ -4,12 +4,10 @@ package com.sungcor.baobiao.controller;
 import com.sungcor.baobiao.entity.Result;
 import com.sungcor.baobiao.service.IProductOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 public class ProductOrderController {
@@ -23,12 +21,22 @@ public class ProductOrderController {
     }
 
     @PostMapping("/buyProductByThread")
-    public void buyProductByThread(@RequestBody Map map){
+    public void buyProductByThread(@RequestBody Map map) {
         productOrderService.buyByThread(map);
     }
 
     @PostMapping("/buyProduct")
-    public Result buyProduct(@RequestBody Map map){
-        return productOrderService.buy(map);
+    public void buyProduct(@RequestBody Map map) throws Exception{
+        productOrderService.buy(map);
+    }
+
+    @GetMapping("/simulateException")
+    public void simuExce(){
+        productOrderService.simulateException();
+    }
+
+    @PostMapping("/pay")
+    public void payMoney(@RequestBody Map map){
+//        productOrderService.pay();
     }
 }

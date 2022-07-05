@@ -5,14 +5,17 @@ import com.sungcor.baobiao.entity.Product;
 import com.sungcor.baobiao.entity.Result;
 import com.sungcor.baobiao.mapper.ProductOrderMapper;
 import com.sungcor.baobiao.service.IProductOrderService;
+import com.sungcor.baobiao.utils.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 @Service
@@ -37,60 +40,80 @@ public class ProductOrderServiceImpl implements IProductOrderService {
         }
     }
 
-    @Override
-    public void buyByThread(Map map) {
-        threadPoolTaskExecutor.execute(() -> buy(map));
-    }
-
-    @Override
-    public Result buy(Map map) {
+    public Map getTheDetail(Map map) {
         String userId = map.get("userId").toString();
         String productId = map.get("productId").toString();
         Integer count = (Integer) map.get("count");
-        if (userId == null || productId == null || count == null) {
-            return Result.error("未获取到参数");
+        if (userId != null && productId != null && count != null) {
+            Customer customer = productOrderMapper.getTheCustomer(userId);
+            Product product = productOrderMapper.getTheProduct(productId);
+            Map detail = new HashMap();
+            detail.put("customer", customer);
+            detail.put("product", product);
+            detail.put("count", count);
+            return detail;
+        } else {
+            return null;
         }
-        synchronized (this) {
-            try {
-                Customer customer = productOrderMapper.getTheCustomer(userId);
-                Product product = productOrderMapper.getTheProduct(productId);
-                if (customer == null || product == null) {
-                    return Result.error("顾客或商品信息有误");
-                }
-                if (count > 0 && count <= product.getCount()) {
-                    return pay(customer, product, count);
 
+    }
+
+    @Override
+    public void buyByThread(Map map) {
+        for (int i = 1; i <= 20; i++) {
+            Future future = threadPoolTaskExecutor.submit(() -> {
+                try {
+                    boolean canBuy = buy(map);
+                    if (canBuy) {
+                        Long l = (long) (60000 * Math.random());
+                        log.info("付款要花" + l / 1000 + "秒");
+                        Thread.sleep(l);
+                        pay(map);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                return Result.error("库存不足");
-            } catch (Exception e) {
-                e.printStackTrace();
-                return Result.error(e.toString());
+            });
+            try {
+                future.get(30, TimeUnit.SECONDS);
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                future.cancel(true);
+                log.info("付款超时");
+//            throw new CustomException("付款超时");
             }
         }
     }
 
+    @Transactional(rollbackFor = {CustomException.class, ArithmeticException.class})
+    public void simulateException() {
+        Product cvbn5 = productOrderMapper.getTheProduct("cvbn5");
+        cvbn5.setCount(600);
+        productOrderMapper.updateProduct(cvbn5);
+        int i = 1 / 0;
+    }
+
     @Override
-    public Result pay(Customer customer, Product product, Integer count){
-        Integer needMoney = count * product.getValue();
-        Future<Serializable> future = executorService.submit(() -> {
-            if (customer.getBalance() >= needMoney) {
-                Long l = (long) (60000 * Math.random());
-                log.info("付款要花" + l / 1000 + "秒");
-                TimeUnit.SECONDS.sleep(l/1000);
-                customer.setBalance(customer.getBalance() - needMoney);
-                product.setCount(product.getCount() - count);
-                productOrderMapper.updateCustomer(customer);
-                productOrderMapper.updateProduct(product);
-            }
-            return Result.error("余额不足");
-        });
-        try {
-            future.get(30, TimeUnit.SECONDS);
-            return Result.ok("抢购成功");
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            future.cancel(true);
-            return Result.error("付款超时");
+    @Async
+//    @Transactional(rollbackFor = {CustomException.class})
+    public Boolean buy(Map map) throws InterruptedException {
+        Map detail = getTheDetail(map);
+        if (detail == null) {
+            return false;
         }
+        Customer customer = (Customer) detail.get("customer");
+        Product product = (Product) detail.get("product");
+        Integer count = (Integer) detail.get("count");
+        if (customer != null && product != null) {
+            if (count > 0 && count <= product.getCount()) {
+                if (customer.getBalance() >= count * product.getValue()) {
+                    return true;
+                }
+//                       throw new CustomException("余额不足");
+            }
+//                throw new CustomException("顾客或商品信息有误");
+        }
+//            throw new CustomException("未获取到参数");
+        return false;
     }
 
     @Override
@@ -98,4 +121,26 @@ public class ProductOrderServiceImpl implements IProductOrderService {
         productOrderMapper.getGoods();
         return Result.ok("补货成功");
     }
+
+    @Override
+    @Async
+//    @Transactional(rollbackFor = {CustomException.class})
+    public void pay(Map map) throws InterruptedException {
+        Map detail = getTheDetail(map);
+        Customer customer = (Customer) detail.get("customer");
+        Product product = (Product) detail.get("product");
+        Integer count = (Integer) detail.get("count");
+        customer.setBalance(customer.getBalance() - count * product.getValue());
+        product.setCount(product.getCount() - count);
+        productOrderMapper.updateCustomer(customer);
+        productOrderMapper.updateProduct(product);
+        log.info("抢购成功");
+    }
+
+//    public void updateDatabase(Customer customer, Product product) {
+//        productOrderMapper.updateCustomer(customer);
+//        productOrderMapper.updateProduct(product);
+//    }
+
+
 }

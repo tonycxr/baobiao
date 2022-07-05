@@ -13,17 +13,19 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  *
  */
 @Configuration
-@ConfigurationProperties(prefix = "threadpool")
 public class ExecutePoolConfiguration {
 
     @Bean(name = "threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
         pool.setKeepAliveSeconds(300);
-        pool.setCorePoolSize(20); // 核心线程池数
-        pool.setMaxPoolSize(40); // 最大线程
-        pool.setQueueCapacity(10); // 队列容量
-        pool.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy()); // 队列满，线程被拒绝执行策略
+        pool.setCorePoolSize(80); // 核心线程池数
+        pool.setMaxPoolSize(20); // 最大线程
+        pool.setQueueCapacity(1000);
+        pool.setThreadNamePrefix("ProductPool");// 队列容量
+        pool.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy());
+        pool.initialize();
+        // 队列满，线程被拒绝执行策略
         return pool;
     }
 

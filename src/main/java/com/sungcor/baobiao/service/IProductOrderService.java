@@ -6,12 +6,14 @@ import com.sungcor.baobiao.entity.Product;
 import com.sungcor.baobiao.entity.Result;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public interface IProductOrderService {
 
     void sleep(int i);
     void buyByThread(Map map);
-    Result buy(Map map);
-    Result pay(Customer customer, Product product, Integer count);
+    Boolean buy(Map map) throws InterruptedException;
     Result getgoods();
+    void pay(Map map) throws InterruptedException;
+    void simulateException();
 }
