@@ -16,4 +16,5 @@ public interface ProductOrderMapper {
     void updateCustomer(Customer customer);
     void updateProduct(Product product);
     void getGoods();
+    void getMoney();
 }

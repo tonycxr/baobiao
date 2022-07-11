@@ -6,6 +6,7 @@ import com.sungcor.baobiao.entity.Result;
 import com.sungcor.baobiao.mapper.ProductOrderMapper;
 import com.sungcor.baobiao.service.IProductOrderService;
 import com.sungcor.baobiao.utils.CustomException;
+import com.sungcor.baobiao.utils.ThreadRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -27,8 +28,6 @@ public class ProductOrderServiceImpl implements IProductOrderService {
 
     @Resource(name = "threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
-    static ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
 
     @Override
     public void sleep(int i) {
@@ -55,34 +54,51 @@ public class ProductOrderServiceImpl implements IProductOrderService {
         } else {
             return null;
         }
+    }
 
+    public boolean JudgeToPurchase(Map map) {
+        try {
+            boolean canBuy = buy(map);
+            if (canBuy) {
+//                        Long l = (long) (60000 * Math.random());
+//                        log.info("付款要花" + l / 1000 + "秒");
+//                        Thread.sleep(l);
+//                    Future future = threadPoolTaskExecutor.submit(() -> {
+                return pay(map);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
     }
 
     @Override
     public void buyByThread(Map map) {
-        for (int i = 1; i <= 20; i++) {
-            Future future = threadPoolTaskExecutor.submit(() -> {
-                try {
-                    boolean canBuy = buy(map);
-                    if (canBuy) {
-                        Long l = (long) (60000 * Math.random());
-                        log.info("付款要花" + l / 1000 + "秒");
-                        Thread.sleep(l);
-                        pay(map);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        // 建立ExecutorService线程池，threadNum个线程可以同时访问
+
+            for (int i = 0; i < 20; i++) {
+                threadPoolTaskExecutor.submit(() -> {
+                if (JudgeToPurchase(map)) {
+                    updateDatabase(map);
                 }
-            });
-            try {
-                future.get(30, TimeUnit.SECONDS);
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                future.cancel(true);
-                log.info("付款超时");
-//            throw new CustomException("付款超时");
+                });
             }
-        }
+
     }
+//        for (int i = 1; i <= 20; i++) {
+//            Future future = threadPoolTaskExecutor.submit(() -> {
+//                theWholePurchase(map);
+//            });
+//            try {
+//                future.get(30, TimeUnit.SECONDS);
+//            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+//                future.cancel(true);
+//                log.info("付款超时");
+////            throw new CustomException("付款超时");
+//            }
+//        }
+
 
     @Transactional(rollbackFor = {CustomException.class, ArithmeticException.class})
     public void simulateException() {
@@ -93,7 +109,6 @@ public class ProductOrderServiceImpl implements IProductOrderService {
     }
 
     @Override
-    @Async
 //    @Transactional(rollbackFor = {CustomException.class})
     public Boolean buy(Map map) throws InterruptedException {
         Map detail = getTheDetail(map);
@@ -119,13 +134,37 @@ public class ProductOrderServiceImpl implements IProductOrderService {
     @Override
     public Result getgoods() {
         productOrderMapper.getGoods();
-        return Result.ok("补货成功");
+        productOrderMapper.getMoney();
+        return Result.ok("重置成功");
     }
 
     @Override
-    @Async
 //    @Transactional(rollbackFor = {CustomException.class})
-    public void pay(Map map) throws InterruptedException {
+    public boolean pay(Map map) throws InterruptedException {
+//        Map detail = getTheDetail(map);
+//        Customer customer = (Customer) detail.get("customer");
+//        Product product = (Product) detail.get("product");
+//        Integer count = (Integer) detail.get("count");
+        Long l = (long) (60000 * Math.random());
+        log.info("付款要花" + l / 1000 + "秒");
+        if(l<=30000) {
+            Thread.sleep(l);
+            return true;
+        }else
+        {
+            Thread.sleep(l);
+            log.info("付款超时");
+            return false;
+        }
+//        customer.setBalance(customer.getBalance() - count * product.getValue());
+//        product.setCount(product.getCount() - count);
+//        productOrderMapper.updateCustomer(customer);
+//        productOrderMapper.updateProduct(product);
+
+    }
+
+
+    public void updateDatabase(Map map) {
         Map detail = getTheDetail(map);
         Customer customer = (Customer) detail.get("customer");
         Product product = (Product) detail.get("product");
@@ -136,11 +175,4 @@ public class ProductOrderServiceImpl implements IProductOrderService {
         productOrderMapper.updateProduct(product);
         log.info("抢购成功");
     }
-
-//    public void updateDatabase(Customer customer, Product product) {
-//        productOrderMapper.updateCustomer(customer);
-//        productOrderMapper.updateProduct(product);
-//    }
-
-
 }

@@ -21,7 +21,7 @@ public class ProductOrderController {
     }
 
     @PostMapping("/buyProductByThread")
-    public void buyProductByThread(@RequestBody Map map) {
+    public void buyProductByThread(@RequestBody Map map)  throws InterruptedException{
         productOrderService.buyByThread(map);
     }
 

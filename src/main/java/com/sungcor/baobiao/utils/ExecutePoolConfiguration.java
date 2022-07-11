@@ -20,7 +20,7 @@ public class ExecutePoolConfiguration {
         ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
         pool.setKeepAliveSeconds(300);
         pool.setCorePoolSize(80); // 核心线程池数
-        pool.setMaxPoolSize(20); // 最大线程
+        pool.setMaxPoolSize(100); // 最大线程
         pool.setQueueCapacity(1000);
         pool.setThreadNamePrefix("ProductPool");// 队列容量
         pool.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy());

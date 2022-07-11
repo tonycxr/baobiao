@@ -25,4 +25,7 @@
         UPDATE productsselling set count = 600
     </update>
 
+    <update id="getMoney" parameterType="com.sungcor.baobiao.entity.Customer">
+        UPDATE Customer set Balance = 999999999 where ID = 'tonycxr30'
+    </update>
 </mapper>

@@ -14,6 +14,6 @@ public interface IProductOrderService {
     void buyByThread(Map map);
     Boolean buy(Map map) throws InterruptedException;
     Result getgoods();
-    void pay(Map map) throws InterruptedException;
+    boolean pay(Map map) throws InterruptedException;
     void simulateException();
 }

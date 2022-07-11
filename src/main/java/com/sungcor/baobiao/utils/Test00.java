@@ -1,53 +1,89 @@
 package com.sungcor.baobiao.utils;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
+
+import java.text.NumberFormat;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Test00 {
-    public static void main(String[] args) throws Exception{
-        ForkJoinPool pool=new ForkJoinPool();
-        // 创建异步执行任务:
-        CompletableFuture<Double> cf = CompletableFuture.supplyAsync(()->{
-            System.out.println(Thread.currentThread()+" start job1,time->"+System.currentTimeMillis());
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-            }
-            System.out.println(Thread.currentThread()+" exit job1,time->"+System.currentTimeMillis());
-            return 1.2;
-        },pool);
-        //cf关联的异步任务的返回值作为方法入参，传入到thenApply的方法中
-        CompletableFuture cf2=cf.thenApply((result)->{
-            System.out.println(Thread.currentThread()+" start job2,time->"+System.currentTimeMillis());
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-            }
-            System.out.println(Thread.currentThread()+" exit job2,time->"+System.currentTimeMillis());
-            return "test:"+result;
-        }).thenAccept((result)-> { //接收上一个任务的执行结果作为入参，但是没有返回值
-            System.out.println(Thread.currentThread()+" start job3,time->"+System.currentTimeMillis());
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-            }
-            System.out.println(result);
-            System.out.println(Thread.currentThread()+" exit job3,time->"+System.currentTimeMillis());
-        }).thenRun(()->{ //无入参，也没有返回值
-            System.out.println(Thread.currentThread()+" start job4,time->"+System.currentTimeMillis());
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-            }
-            System.out.println("thenRun do something");
-            System.out.println(Thread.currentThread()+" exit job4,time->"+System.currentTimeMillis());
-        });
-        System.out.println("main thread start cf.get(),time->"+System.currentTimeMillis());
-        //等待子任务执行完成
-        System.out.println("run result->"+cf.get());
-        System.out.println("main thread start cf2.get(),time->"+System.currentTimeMillis());
-        //cf2 等待最后一个thenRun执行完成
-        System.out.println("run result->"+cf2.get());
-        System.out.println("main thread exit,time->"+System.currentTimeMillis());
+    static int count = 0;
+    // 总访问量是clientNum，并发量是threadNum
+    int threadNum = 4;
+    int clientNum = 20;
+    float avgExecTime = 0;
+    float sumexecTime = 0;
+    long firstExecTime = Long.MAX_VALUE;
+    long lastDoneTime = Long.MIN_VALUE;
+    float totalExecTime = 0;
+
+    public static void main(String[] args) {
+        new Test00().run();
+        System.out.println("finished!");
     }
+
+    public void run() {
+        final ConcurrentHashMap<Integer, ThreadRecord> records = new ConcurrentHashMap<Integer, ThreadRecord>();
+        // 建立ExecutorService线程池，threadNum个线程可以同时访问
+        ExecutorService exec = Executors.newFixedThreadPool(threadNum);
+        // 模拟clientNum个客户端访问
+        final CountDownLatch doneSignal = new CountDownLatch(clientNum);
+
+        for (int i = 0; i < clientNum; i++) {
+            Runnable run = new Runnable() {
+                public void run() {
+                    int index = getIndex();
+                    long systemCurrentTimeMillis = System.currentTimeMillis();
+                    try {
+                        String sendGet = "run";
+                        System.out.println(System.currentTimeMillis() + sendGet);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    records.put(index, new ThreadRecord(systemCurrentTimeMillis, System.currentTimeMillis()));
+                    doneSignal.countDown();// 每调用一次countDown()方法，计数器减1
+                }
+            };
+            exec.execute(run);
+        }
+        try {
+            // 计数器大于0 时，await()方法会阻塞程序继续执行
+            doneSignal.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        /**
+         * 获取每个线程的开始时间和结束时间
+         */
+        for (int i : records.keySet()) {
+            ThreadRecord r = records.get(i);
+            sumexecTime += ((double) (r.getEndTime() - r.getStartTime())) / 1000;
+
+            if (r.getStartTime() < firstExecTime) {
+                firstExecTime = r.getStartTime();
+            }
+            if (r.getEndTime() > lastDoneTime) {
+                this.lastDoneTime = r.getEndTime();
+            }
+        }
+        this.avgExecTime = this.sumexecTime / records.size();
+        this.totalExecTime = ((float) (this.lastDoneTime - this.firstExecTime)) / 1000;
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMaximumFractionDigits(4);
+        System.out.println("======================================================");
+        System.out.println("线程数量:\t\t" + threadNum);
+        System.out.println("客户端数量:\t" + clientNum);
+        System.out.println("平均执行时间:\t" + nf.format(this.avgExecTime) + "秒");
+        System.out.println("总执行时间:\t" + nf.format(this.totalExecTime) + "秒");
+        System.out.println("吞吐量:\t\t" + nf.format(this.clientNum / this.totalExecTime) + "次每秒");
+    }
+
+    public static int getIndex() {
+        return ++count;
+    }
+
 }
+
+
