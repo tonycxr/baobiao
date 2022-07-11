@@ -72,6 +72,7 @@ public class Test00 {
         this.totalExecTime = ((float) (this.lastDoneTime - this.firstExecTime)) / 1000;
         NumberFormat nf = NumberFormat.getNumberInstance();
         nf.setMaximumFractionDigits(4);
+        System.out.println();
         System.out.println("======================================================");
         System.out.println("线程数量:\t\t" + threadNum);
         System.out.println("客户端数量:\t" + clientNum);
